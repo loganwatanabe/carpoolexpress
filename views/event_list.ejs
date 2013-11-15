@@ -1,0 +1,51 @@
+<!Doctype HTML>
+<html>
+<head>
+        <link rel="stylesheet" href="/jquery.mobile-1.3.2/jquery.mobile-1.3.2.css" />
+        <script src="/javascripts/jquery-1.10.2.min.js"></script>
+        <script src="/jquery.mobile-1.3.2/jquery.mobile-1.3.2.min.js"></script>
+         <link rel="stylesheet" href="/stylesheets/override.css" />
+        <title><%= title %></title>
+</head>
+<body>
+    <div data-role="header">
+      <a href="/" data-icon="bars" class="ui-btn-left">Menu</a>
+      <h1><%=title%></h1>
+      <a href="/login" data-icon="star" class="ui-btn-right" data-theme="b">Log In</a>
+    </div>
+    <div class="container">
+        <h1><%= title %></h1>
+        <a href= "/event/new" data-role="button" data-inline="true" data-mini="true" data-theme="b">Create an Event</a>
+        <ul data-role="listview">
+
+        	<% if(collection==null || collection.size==0) {%>
+        		<tr><td>There is nothing in this collection.</td></tr>
+        	<% }else{ %>
+            <li>
+                <table>
+        			<tr>
+                        <td>Name</td>
+                        <td>Date</td>
+                        <td>Location</td>
+                        <td>ID</td>
+        			</tr>
+                </table>
+            </li>
+        	<% for(object in collection){ var obj=collection[object];%>
+            <li><a href=<%="event/"+obj._id%>>
+                <table>
+        			<tr id="">
+        				<td><%= obj.name %></td>
+                        <td><%= obj.date %></td>
+                        <td><%= obj.location %></td>
+                        <td><%= obj._id %></td>
+        			</tr>
+                </table>
+            </a></li>
+        		<% }%>
+
+        	<% }%>
+    	</ul>
+    </div>
+</body>
+</html>

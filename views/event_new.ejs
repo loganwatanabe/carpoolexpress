@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+        <link rel="stylesheet" href="/jquery.mobile-1.3.2/jquery.mobile-1.3.2.css" />
+        <script src="/javascripts/jquery-1.10.2.min.js"></script>
+        <script src="/jquery.mobile-1.3.2/jquery.mobile-1.3.2.min.js"></script>
+         <link rel="stylesheet" href="/stylesheets/override.css" />
+        <title><%= title %></title>
+</head>
+<body>
+    <div data-role="header">
+      <a href="/" data-icon="bars" class="ui-btn-left">Menu</a>
+      <h1><%=title%></h1>
+      <a href="/login" data-icon="star" class="ui-btn-right" data-theme="b">Log In</a>
+    </div>
+    
+    <form action="/event/new" method="post" data-mini="true">
+        <div data-role="fieldcontain">
+            <label>Event name:</label>
+            <input type="text" name="name"  id="name"/>
+        </div>
+        <div data-role="fieldcontain">
+            <label>Date:</label>
+            <input type="date" name="date"  id="date"/>
+        </div>
+        <div data-role="fieldcontain">
+            <label>Location:</label>
+            <input type="text" name="location" id="location"/>
+        </div>        
+        <div data-role="fieldcontain">
+            <label>Start Time:</label>
+            <input type="time" name="start_time" id="start_time"/>
+        </div>
+        <div data-role="fieldcontain">
+            <label>End Time:</label>
+            <input type="time" name="end_time" id="end_time"/>
+        </div>
+        <div data-role="fieldcontain">
+            <label for="textarea">Description:</label>
+            <textarea name="description" id="description"></textarea>
+        </div>
+        <div>
+            <input type="submit" value="Create Event"/>
+        </div>
+    </form>
+</body>
+<html>

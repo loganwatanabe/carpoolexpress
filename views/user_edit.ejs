@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+        <link rel="stylesheet" href="/jquery.mobile-1.3.2/jquery.mobile-1.3.2.css" />
+        <script src="/javascripts/jquery-1.10.2.min.js"></script>
+        <script src="/jquery.mobile-1.3.2/jquery.mobile-1.3.2.min.js"></script>
+         <link rel="stylesheet" href="/stylesheets/override.css" />
+         <title><%= first_name + " " + last_name %></title>
+</head>
+<body>
+    <div data-role="header">
+      <a href="/" data-icon="bars" class="ui-btn-left">Menu</a>
+      <h1><%= first_name + " " + last_name %></h1>
+      <a href="/login" data-icon="star" class="ui-btn-right" data-theme="b">Log In</a>
+    </div>
+    
+    <form action=<%="/user/"+id+"/save" %> method="post" data-mini="true">
+        <div data-role="fieldcontain">
+            <label>Username:</label>
+            <input type="text" name="username"  id="username" value="<%= username%>">
+        </div>
+        <div data-role="fieldcontain">
+            <label>Password:</label>
+            <input type="password" name="password"  id="password" value="<%= password%>">
+        </div>
+        <div data-role="fieldcontain">
+            <label>First Name:</label>
+            <input type="text" name="first_name" id="first_name" value="<%= first_name%>">
+        </div>
+        <div data-role="fieldcontain">
+            <label>Last Name:</label>
+            <input type="text" name="last_name" id="last_name" value="<%= last_name%>">
+        </div>
+        <div data-role="fieldcontain">
+            <label>Email:</label>
+            <input type="text" name="email" id="email" value="<%= email%>">
+        </div>
+        <div data-role="fieldcontain">
+            <label for="textarea">Contact Info:</label>
+            <textarea name="contact" id="contact"><%= contact%></textarea>
+        </div>
+        <div><input type="hidden" name="_id" value=<%= id %>></div>
+        <div>
+            <input type="submit" value="Update User">
+        </div>
+    </form>
+</body>
+<html>

@@ -5,6 +5,7 @@
 
 var express = require('express');
 var flash = require('connect-flash');
+var ejs_locals = require('ejs-locals');
 var routes = require('./routes');
 var home = require("./routes/index")
 var user = require('./routes/user');
@@ -23,6 +24,7 @@ var app = express();
 app.configure(function(){
 	app.set('port', process.env.PORT || 3000);
 	app.set('views', path.join(__dirname, 'views'));
+	app.engine('ejs',ejs_locals);
 	app.set('view engine', 'ejs');
 	app.use(express.favicon());
 	app.use(express.logger('dev'));
@@ -202,7 +204,9 @@ app.get('/user/:id', function(req, res) {
 			last_name: user.last_name,
 			email: user.email,
 			contact: user.contact,
-			id:user._id
+			id:user._id,
+			user:req.user,
+			title:user.username
         }
         });
     });
@@ -220,7 +224,9 @@ app.get('/user/:id/edit', function(req, res) {
 			first_name: user.first_name,
 			last_name: user.last_name,
 			email: user.email,
-			contact: user.contact
+			contact: user.contact,
+			user:req.user,
+			title:user.username,
 		}
 		});
 	});
@@ -259,7 +265,8 @@ app.get('/events', function(req,res){
 	eventClass.findAll(function(error, docs){
 			res.render('event_list.ejs', {locals:{
 				title: 'Events',
-				collection: docs
+				collection: docs,
+				user:req.user
 				}
 			});
 		})
@@ -268,7 +275,11 @@ app.get('/events', function(req,res){
 //new event
 // app.get('/event/new', ensureAuthenticated, function(req,res){
 app.get('/event/new', function(req,res){
-		res.render('event_new.ejs', {locals: {title:'Create Event'}});
+		res.render('event_new.ejs', {locals: {
+			title:'Create Event',
+			user:req.user}
+		});
+
 	});
 
 // app.post('/event/new', ensureAuthenticated, function(req,res){
@@ -295,7 +306,9 @@ app.get('/event/:id', function(req, res) {
 			start_time: event.start_time,
 			end_time: event.end_time,
 			description: event.description,
-			id:event._id
+			id:event._id,
+			user:req.user,
+			title:event.name
         }
         });
     });
@@ -313,7 +326,9 @@ app.get('/event/:id/edit', function(req, res) {
 			start_time: event.start_time,
 			end_time: event.end_time,
 			description: event.description,
-			id:event._id
+			id:event._id,
+			user:req.user,
+			title:event.name
         }
 		});
 	});

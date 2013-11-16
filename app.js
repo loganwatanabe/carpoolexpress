@@ -73,8 +73,25 @@ passport.deserializeUser(function(id, done) {
 
 
 
+// Need to implement a FBuser collection, or alter USERS to search fpr facebook user ids
+// passport.deserializeUser(function(id, done) {
+//     FbUsers.findById(id, function (err,user){
+//         if(err) done(err);
+//         if(user){
+//             done(null,user);
+//         }else{
+//             userClass.findById(id, function(err,user){
+//                 if(err) done(err);
+//                 done(null,user);
+//             });
+//         }
+//     });
+// });
+
+
+
 passport.use(new LocalStrategy(
-  function(username, password, done) {
+  function(usernameORemail, password, done) {
     // asynchronous verification, for effect...
     process.nextTick(function () {
       
@@ -82,9 +99,9 @@ passport.use(new LocalStrategy(
       // username, or the password is not correct, set the user to `false` to
       // indicate failure and set a flash message.  Otherwise, return the
       // authenticated `user`.
-      userClass.findByUsername(username, function(err, user) {
+      userClass.findByUsernameOrEmail(usernameORemail, function(err, user) {
         if (err) { return done(err); }
-        if (!user) { return done(null, false, { message: 'Unknown user ' + username }); }
+        if (!user) { return done(null, false, { message: 'Unknown username or email: ' + usernameORemail }); }
         if (user.password != password) { return done(null, false, { message: 'Invalid password' }); }
         return done(null, user);
       })
@@ -92,6 +109,30 @@ passport.use(new LocalStrategy(
   }
 ));
 
+passport.use(new FacebookStrategy({
+    clientID: "Lwatanab67328",
+    clientSecret: "417957444996823",
+    callbackURL: "http://localhost:3000/auth/facebook/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+  	//make this a function in userClass, and call it here
+    userClass.findByUsernameOrEmail(profile.email, function(err, oldUser){
+        if(oldUser){
+            done(null,oldUser);
+        }else{
+            var newUser = new userClass({
+                username: profile.displayName,
+                email : profile.emails[0].value,
+                first_name : profile.givenName,
+                last_name : profile.familyName
+            }).save(function(err,newUser){
+                if(err) throw err;
+                done(null, newUser);
+            });
+        }
+    });
+  }
+));
 
 
 
@@ -116,63 +157,28 @@ app.get('/login', function(req, res){
   res.render('login.ejs', { user: req.user, message: req.flash('error') });
 });
 
-// POST /login
-//   Use passport.authenticate() as route middleware to authenticate the
-//   request.  If authentication fails, the user will be redirected back to the
-//   login page.  Otherwise, the primary route function function will be called,
-//   which, in this example, will redirect the user to the home page.
-//
-//   curl -v -d "username=bob&password=secret" http://127.0.0.1:3000/login
 app.post('/login', 
   passport.authenticate('local', { failureRedirect: '/login', failureFlash: true }),
   function(req, res) {
     res.redirect('/');
   });
-  
-// POST /login
-//   This is an alternative implementation that uses a custom callback to
-//   acheive the same functionality.
-/*
-app.post('/login', function(req, res, next) {
-  passport.authenticate('local', function(err, user, info) {
-    if (err) { return next(err) }
-    if (!user) {
-      req.flash('error', info.message);
-      return res.redirect('/login')
-    }
-    req.logIn(user, function(err) {
-      if (err) { return next(err); }
-      return res.redirect('/users/' + user.username);
-    });
-  })(req, res, next);
-});
-*/
 
-app.get('/logout', function(req, res){
-  req.logout();
-  res.redirect('/');
-});
-
-// app.get('/login', home.login);
-// app.post('/login',
-//   passport.authenticate('local', { successRedirect: '/',
-//                                    failureRedirect: '/login',
-//                                    failureFlash: true })
-// );
-
-// //for passport-facebook
-// 	// Redirect the user to Facebook for authentication.  When complete,
-// 	// Facebook will redirect the user back to the application at
-// 	//     /auth/facebook/callback
-// app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+//for passport-facebook
+	// Redirect the user to Facebook for authentication.  When complete,
+	// Facebook will redirect the user back to the application at
+	//     /auth/facebook/callback
+app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
 
 // 	// Facebook will redirect the user to this URL after approval.  Finish the
 // 	// authentication process by attempting to obtain an access token.  If
 // 	// access was granted, the user will be logged in.  Otherwise,
 // 	// authentication has failed.
-// app.get('/auth/facebook/callback', passport.authenticate('facebook', { successRedirect: '/', failureRedirect: '/login' }));
+app.get('/auth/facebook/callback', passport.authenticate('facebook', { successRedirect: '/', failureRedirect: '/login' }));
 
-
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
 
 
 //routes for user CRUD
@@ -216,6 +222,7 @@ app.get('/user/:id', function(req, res) {
 // app.get('/user/:id/edit', ensureAuthenticated, function(req, res) {
 app.get('/user/:id/edit', function(req, res) {
 	userClass.findById(req.params.id, function(error, user) {
+		//if(req.user._id == req.params.id)//user edits themselves
 		res.render('user_edit',
 		{ locals: {
 			id: user._id,

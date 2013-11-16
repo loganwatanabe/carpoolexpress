@@ -58,13 +58,14 @@ UserClass.prototype.findById = function(id, callback) {
 
 
 //find a user by username
-UserClass.prototype.findByUsername = function(userN, callback) {
+UserClass.prototype.findByUsernameOrEmail = function(usernameORemail, callback) {
     this.getCollection(function(error, user_collection) {
       if( error ) callback(error)
       else {
-        user_collection.findOne({username: userN}, function(error, result) {
+        user_collection.findOne( {$or: [{ username:usernameORemail },{ email: usernameORemail }]}
+          , function(error, result) {
           if( error ) callback(error)
-          else callback(null, result)
+          else callback(null, result)//returns a user
         });
       }
     });

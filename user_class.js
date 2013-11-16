@@ -56,6 +56,20 @@ UserClass.prototype.findById = function(id, callback) {
     });
 };
 
+
+//find a user by username
+UserClass.prototype.findByUsername = function(userN, callback) {
+    this.getCollection(function(error, user_collection) {
+      if( error ) callback(error)
+      else {
+        user_collection.findOne({username: userN}, function(error, result) {
+          if( error ) callback(error)
+          else callback(null, result)
+        });
+      }
+    });
+};
+
 //save new user
 UserClass.prototype.save = function(users, callback) {
     this.getCollection(function(error, user_collection) {

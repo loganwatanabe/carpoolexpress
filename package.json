@@ -15,6 +15,7 @@
     "passport": "*",
     "passport-local": "*",
     "passport-facebook": "*",
-    "connect-roles": "*"
+    "connect-roles": "*",
+    "connect-flash": "*"
   }
 }

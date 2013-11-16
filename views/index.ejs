@@ -12,7 +12,12 @@
     <div data-role="header">
       <a href="/" data-icon="bars" class="ui-btn-left">Menu</a>
       <h1>Home</h1>
-      <a href="/login" data-icon="star" class="ui-btn-right" data-theme="b">Log In</a>
+
+      <%if(user!=null){%>
+      <a href="/user/<%=user._id%>" data-icon="star" class="ui-btn-right" data-theme="b"><%=user.username%></a>
+      <%} else {%>
+        <a href="/login" data-icon="star" class="ui-btn-right" data-theme="b">Log In</a>
+      <%}%>
     </div>
 
     <img id="index_img" src="/images/holder.jpg" alt="Welcome">

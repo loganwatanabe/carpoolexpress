@@ -8,23 +8,31 @@ var flash = require('connect-flash');
 var ejs_locals = require('ejs-locals')
 var RedisStore = require ( 'connect-redis' ) ( express );
 var sessionStore = new RedisStore ();
+var passport = require("passport");
+var LocalStrategy = require('passport-local').Strategy;
+var FacebookStrategy = require('passport-facebook').Strategy;
+var superagent = require('superagent');
+require('superagent-oauth')(superagent);
+var OAuth = require('oauth');
 
+//routes
 var routes = require('./routes');
 var home = require("./routes/index")
 var user = require('./routes/user');
 var event = require('./routes/event');
 var http = require('http');
 var path = require('path');
+
+//model stuff
 var UserClass = require('./user_class').UserClass;
 var EventClass = require('./event_class').EventClass;
 var DriverClass = require('./driver_class').DriverClass;
 var RiderClass = require('./rider_class').RiderClass;
-
-var passport = require("passport");
-var LocalStrategy = require('passport-local').Strategy;
-var FacebookStrategy = require('passport-facebook').Strategy;
+var CarpoolClass = require('./carpool_class').CarpoolClass;
 
 var app = express();
+var helpers = require('express-helpers');
+helpers(app);
 
 // all environments
 app.configure(function(){
@@ -61,10 +69,11 @@ if ('development' == app.get('env')) {
 
 
 
-var userClass = new UserClass('localhost', 27017);//assignment12
-var eventClass = new EventClass('localhost', 27017);//assignment12
-var driverClass = new DriverClass('localhost', 27017);//assignment12
-var riderClass = new RiderClass('localhost', 27017);//assignment12
+var userClass = new UserClass('localhost', 27017);
+var eventClass = new EventClass('localhost', 27017);
+var driverClass = new DriverClass('localhost', 27017);
+var riderClass = new RiderClass('localhost', 27017);
+var carpoolClass = new CarpoolClass('localhost', 27017);
 
 
 //session management
@@ -401,6 +410,29 @@ app.post('/driver/:id/delete', function(req, res) {
 			//effed up
 		});
 });
+
+app.post('/rider/:id/delete', function(req, res) {
+		riderClass.delete(req.param('_id'), function(error, docs) {
+			res.redirect('/riders');
+			//effed up
+		});
+});
+
+
+//CRUD for CARPOOLS
+app.post('/driver/:driver_id/rider/:rider_id/new', function(req,res){
+		carpoolClass.save({
+			driver_id: req.params.driver_id,
+			event_id: req.params.rider_id,
+			status: req.param('status'),
+			alert: "Pending"
+		}, function(err, docs){
+			res.redirect('back');
+			//effed up
+		});
+		//});
+	});
+
 
 
 app.listen(44444);

@@ -94,7 +94,11 @@
                         <% for(i=0;i<empt;i++){ %>
                             <% if(cc>101){cc=97}%>
                             <div class="ui-block-<%=String.fromCharCode(cc)%>"><div class="ui-bar" style="height:60px">
-                                Sign up here
+                                                                        <!---->
+                            <form method="post" action=<%= "/driver/"+driver.id+"/rider/"+"user_rsvp.id" %>>
+                                <input name="status" type="hidden" value="Request">
+                                <input data-role="button" data-inline="true" data-mini="true" data-theme="e" id="request" name="request" value="Request a Ride" type="submit">
+                            </form>
                             </div></div>
                         <% } %>
                     </div><!-- /grid-c -->

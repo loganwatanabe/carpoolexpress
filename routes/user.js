@@ -1,62 +1,96 @@
 
-var user_class = require('../user_class').UserClass;
+var UserClass = require('../user_class').UserClass;
+var userClass = new UserClass('localhost', 27017);
 
 exports.list = function(req, res){
-  res.send("respond with a resource");
+    userClass.findAll(function(error, docs){
+      console.log(docs);
+      res.render('user_list.ejs', {locals:{
+        title: 'Users',
+        collection: docs,
+        user:req.user
+        }
+      });
+    });
 };
 
-exports.all = function(req, res){
-  user_class.findAll(function(error, docs){
-    res.send(docs);
-      // res.render('index', {
-      //       title: 'Users',
-      //       users:users
-      //   });
+exports.new = function(req, res){
+  res.render('register.ejs', {locals: {title:'register'}});
+};
+
+
+exports.create = function(req, res){
+  userClass.save({
+      username: req.param('username'),
+      password: req.param('password'),
+      first_name: req.param('first_name'),
+      last_name: req.param('last_name'),
+      email: req.param('email'),
+      contact: req.param('contact')
+    }, function(err, docs){
+      res.redirect('/users');
+      //effed up
+    });
+};
+
+exports.get = function(req, res){
+  userClass.findById(req.params.id, function(error, user) {
+        res.render('user_show',
+        { locals: {
+          username: user.username,
+          password: user.password,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          email: user.email,
+          contact: user.contact,
+          fb_id: user.fb_id,
+          accessToken: user.access,
+          id:user._id,
+          user:req.user,
+          title:user.username
+        }
+        });
+    });
+};
+
+exports.edit = function(req, res){
+  userClass.findById(req.params.id, function(error, user) {
+    //if(req.user._id == req.params.id)//user edits themselves
+    res.render('user_edit',
+    { locals: {
+      id: user._id,
+      username: user.username,
+      password: user.password,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      contact: user.contact,
+      user:req.user,
+      title:user.username,
+    }
+    });
   });
 };
 
-//render new user page
-exports.register = function(req, res) {
-    res.render('user_register', {
-        title: 'New User'
+exports.update = function(req, res){
+  userClass.update(req.param('_id'),{
+    username: req.param('username'),
+    password: req.param('password'),
+    first_name: req.param('first_name'),
+    last_name: req.param('last_name'),
+    email: req.param('email'),
+    contact: req.param('contact')
+  }, function(error, docs) {
+    res.redirect('/user/'+req.param('_id'));
+    //effed up
+  });
+};
+
+exports.delete = function(req, res){
+    userClass.delete(req.param('_id'), function(error, docs) {
+      res.redirect('/users');
+      //effed up
     });
 };
 
-//save new user
-exports.save = function(req, res){
-    user_class.save({
-        title: req.param('title'),//change these values
-        name: req.param('name') //change these values
-    }, function( error, docs) {
-        res.redirect('/')//change this
-    });
-};
-
-
-
-//render user edit page
-exports.edit = function(req, res) {
-        user_class.findById(req.param('_id'), function(error, user) {
-                res.render('user_edit',
-                { 
-                        user: user
-                });
-        });
-	};
-
-//save updated user
-exports.update = function(req, res) {
-        user_class.update(req.param('_id'),{
-                title: req.param('title'),//change these fields
-                name: req.param('name')//change these fields
-        }, function(error, docs) {
-                res.redirect('/')
-        });
-};
-
-//delete an employee
-exports.delete = function(req, res) {
-        user_class.delete(req.param('_id'), function(error, docs){
-                res.redirect('/')
-        });
-};
+//need a user.revokeFacebookAccess or something to remove app from facebook profile

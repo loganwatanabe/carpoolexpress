@@ -9,7 +9,7 @@ var ObjectID = require('mongodb').ObjectID;
 
 RiderClass = function(host, port){
   var db = new mongodb.Db('nodejitsu_loganwatanabe_nodejitsudb9965101284',
-            new mongodb.Server('ds045978.mongolab.com', 45978, {}));
+            new mongodb.Server('ds045978.mongolab.com', 45978, {}), {safe:true});
     db.open(function (err, db_p) {
     if (err) { throw err; }
     db.authenticate('nodejitsu_loganwatanabe', '5rqqdp0qka16ean53d3cunur4p', function (err, replies) {
@@ -49,6 +49,23 @@ RiderClass.prototype.findById = function(id, callback) {
         rider_collection.findOne({_id: rider_collection.db.bson_serializer.ObjectID.createFromHexString(id)}, function(error, result) {
           if( error ) callback(error)
           else callback(null, result)
+        });
+      }
+    });
+};
+
+//find a driver by Event
+RiderClass.prototype.findByEvent = function(eventID, callback) {
+    this.getCollection(function(error, rider_collection) {
+      if( error ) callback(error)
+      else {
+        rider_collection.find({event_id: eventID}).toArray(function(error, results) {
+          if( error ){
+            callback(error);
+          }
+          else{
+            callback(null, results);
+          }
         });
       }
     });

@@ -7,15 +7,44 @@
     <title><%=title%></title>
     <link rel='stylesheet' href='/stylesheets/style.css'/>
   </head>
+
   <body>
+    <div id="fb-root"></div>
+    <script src="/javascripts/facebook_sdk.js"></script>
     <div data-role="header">
       <a href="/" data-icon="bars" class="ui-btn-left">Menu</a>
       <h1><%=title%></h1>
 
       <%if(user!=null){%>
-      <a href="/user/<%=user._id%>" data-icon="star" class="ui-btn-right" data-theme="b"><%=user.username%></a>
+
+      <a href="#popupMenu" data-icon="star" data-rel="popup" data-role="button" class="ui-btn-right" data-inline="true" data-transition="slidedown" data-theme="b"><%=user.first_name + " " + user.last_name%></a>
+      <div data-role="popup" id="popupMenu" data-theme="d" >
+              <ul data-role="listview" data-inset="true" style="min-width:210px;" data-theme="d">
+                  <li><a href="/user/<%=user._id%>">My Profile</a></li>
+                  <li><a href="#">My Events</a></li>
+                  <li><a href="#">My Rides</a></li>
+                  <li><a href="/logout">Log Out</a></li>
+              </ul>
+      </div>
+
+
       <%} else {%>
-        <a href="/login" data-icon="star" class="ui-btn-right" data-theme="b">Log In</a>
+        <a href="#popuplogin" data-rel="popup" data-position-to="window" data-role="button" class="ui-btn-right" data-inline="true" data-icon="check" data-theme="b" data-transition="pop">Login</a>
+        <div data-role="popup" id="popuplogin" data-theme="a" data-overlay-theme="a" class="ui-corner-all">
+          <!-- message--> 
+            <form action="/login" method="post">
+                <div style="padding:10px 20px;">
+                    <h3>Please sign in</h3>
+                    <label for="username" class="ui-hidden-accessible">Username:</label>
+                    <input type="text" name="username" id="username" value="" placeholder="username or email" data-theme="a">
+                    <label for="password" class="ui-hidden-accessible">Password:</label>
+                    <input type="password" name="password" id="password" value="" placeholder="password" data-theme="a">
+                    <input type="submit" data-theme="b" data-icon="check" value="Sign in">
+
+                    <a href="http://lwatanab.jit.su/auth/facebook"><img src="/images/login-with-facebook.png" width="154" height="22"></a>
+                </div>
+            </form>
+        </div>
       <%}%>
     </div>
     <%- body%>

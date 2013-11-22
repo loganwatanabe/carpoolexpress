@@ -11,7 +11,7 @@ var ObjectID = require('mongodb').ObjectID;
 
 UserClass = function(host, port){
 	var db = new mongodb.Db('nodejitsu_loganwatanabe_nodejitsudb9965101284',
-            new mongodb.Server('ds045978.mongolab.com', 45978, {}));
+            new mongodb.Server('ds045978.mongolab.com', 45978, {}), {safe:true});
     db.open(function (err, db_p) {
     if (err) { throw err; }
     db.authenticate('nodejitsu_loganwatanabe', '5rqqdp0qka16ean53d3cunur4p', function (err, replies) {
@@ -46,7 +46,7 @@ UserClass.prototype.findAll = function(callback) {
 //find a user by ID
 UserClass.prototype.findById = function(id, callback) {
     this.getCollection(function(error, user_collection) {
-      if( error ) callback(error)
+      if( error ){ callback(error);}
       else {
         user_collection.findOne({_id: user_collection.db.bson_serializer.ObjectID.createFromHexString(id)}, function(error, result) {
           if( error ) callback(error)

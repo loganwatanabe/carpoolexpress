@@ -9,7 +9,7 @@ var ObjectID = require('mongodb').ObjectID;
 
 EventClass = function(host, port){
   var db = new mongodb.Db('nodejitsu_loganwatanabe_nodejitsudb9965101284',
-            new mongodb.Server('ds045978.mongolab.com', 45978, {}));
+            new mongodb.Server('ds045978.mongolab.com', 45978, {}), {safe:true});
     db.open(function (err, db_p) {
     if (err) { throw err; }
     db.authenticate('nodejitsu_loganwatanabe', '5rqqdp0qka16ean53d3cunur4p', function (err, replies) {

@@ -6,3 +6,11 @@ body {
 a {
   color: #00B7FF;
 }
+
+.row-odd{
+	background-color: #888888;
+}
+
+.row-even{
+	background-color: #E8E8E8;
+}

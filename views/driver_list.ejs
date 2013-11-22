@@ -1,0 +1,37 @@
+<% layout('layout') -%>
+    <div class="container">
+
+        	<% if(collection==null || collection.size==0) {%>
+        		<tr><td>There is nothing in this collection.</td></tr>
+        	<% }else{ %>
+            <li>
+                <table>
+        			<tr>
+                        <td>Name</td>
+                        <td>Date</td>
+                        <td>Location</td>
+                        <td>ID</td>
+        			</tr>
+                </table>
+            </li>
+        	<% for(object in collection){ var obj=collection[object];%>
+            <li><a href=<%="event/"+obj.event_id%>>
+                <table>
+        			<tr id="">
+        				<td><%= obj.event %></td>
+                        <td><%= obj.user %></td>
+                        <td><%= obj.location %></td>
+                        <td><%= obj.time %></td>
+                        <td><%= obj.notes %></td>
+                        <td><%= obj._id %></td>
+        			</tr>
+                </table>
+            </a><form method="post" action=<%= "/"+title+"/"+obj._id+"/delete"%>>
+            				<input name="_id" type="hidden" value=<%=obj._id%>>
+            				<input data-role="button" data-inline="true" data-mini="true" data-theme="e" id="delete" name="delete" value="Delete" type="submit">
+        					</form></li>
+        		<% }%>
+
+        	<% }%>
+    	</ul>
+    </div>

@@ -16,7 +16,7 @@ CarpoolClass = function(host, port){
         // You are now connected and authenticated.
       });
   });
-  this.db=db;  
+  this.db=db;
   // this.db.open(function(){});
 };
 
@@ -53,6 +53,40 @@ CarpoolClass.prototype.findById = function(id, callback) {
       }
     });
 };
+
+//find a carpool by ID
+CarpoolClass.prototype.findRidesForDriver = function(driveID, callback) {
+    this.getCollection(function(error, carpool_collection) {
+      if( error ) callback(error)
+      else {
+        carpool_collection.find({driver_id : driveID, status:'accepted'}).toArray(function(error, results) {
+          if( error ){
+            callback(error);
+          }
+          else{
+            callback(null, results);//returns array of carpools that are accepted
+          }
+        });
+      }
+    });
+};
+
+CarpoolClass.prototype.findRideForRider = function(riderID, callback) {
+    this.getCollection(function(error, carpool_collection) {
+      if( error ) callback(error)
+      else {
+        carpool_collection.findOne({rider_id : riderID, status:'accepted'}, function(error, results) {
+          if( error ){
+            callback(error);
+          }
+          else{
+            callback(null, results);//returns array of carpools that are accepted for one rider
+          }
+        });
+      }
+    });
+};
+
 
 //save new carpool
 CarpoolClass.prototype.save = function(carpools, callback) {

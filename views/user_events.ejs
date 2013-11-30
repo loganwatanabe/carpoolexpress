@@ -1,0 +1,13 @@
+<% layout('layout') -%>
+    
+    <div class="container">
+
+        <% if(drivers.length == 0 && riders.length == 0){ %>
+            <h1>You have not RSVPd to any events yet</h1>
+        <% }else{ %>
+            <script src="/javascripts/user_events.js"></script>
+            <ul id="list_events" data-role="listview" data-inset="true">
+            </ul>
+        <% } %>
+
+    </div>

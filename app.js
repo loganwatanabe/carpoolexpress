@@ -11,9 +11,10 @@ var sessionStore = new RedisStore ();
 var passport = require("passport");
 var LocalStrategy = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
-var superagent = require('superagent');
-require('superagent-oauth')(superagent);
-var OAuth = require('oauth');
+var forEach = require('async-foreach');
+var googlemaps = require('googlemaps');
+var util = require('util');
+
 
 //routes
 var routes = require('./routes');
@@ -29,6 +30,7 @@ var EventClass = require('./event_class').EventClass;
 var DriverClass = require('./driver_class').DriverClass;
 var RiderClass = require('./rider_class').RiderClass;
 var CarpoolClass = require('./carpool_class').CarpoolClass;
+var ObjectID = require('mongodb').ObjectID;
 
 var app = express();
 var helpers = require('express-helpers');
@@ -90,7 +92,7 @@ passport.deserializeUser(function(id, done) {
 });
 
 
-//NEED TO VALIDATE 1 EMAIL or USERNAME=1 USER
+//NEED TO VALIDATE 1 EMAIL and USERNAME=1 USER
 // Need to implement a FBuser collection, or alter USERS to search fpr facebook user ids
 // passport.deserializeUser(function(id, done) {
 //     FbUsers.findById(id, function (err,user){
@@ -162,6 +164,7 @@ passport.use(new FacebookStrategy({
 
 //ROUTES
 app.get('/', home.index);
+//googlemaps pass in or ajax request on that page
 
 
 //for passport-local
@@ -202,7 +205,7 @@ app.get('/users', user.list);//should be deleted in final
 app.get('/register', user.new);
 app.post('/register', user.create);
 
-app.get('/user/:id', user.get);
+app.get('/user/:id', user.get);//can this return an res.send too?
 
 //update a user
 // app.get('/user/:id/edit', ensureAuthenticated, function(req, res) {
@@ -215,14 +218,43 @@ app.post('/user/:id/save', user.update);
 // app.post('/user/:id/delete', ensureAuthenticated,  function(req, res) {
 app.post('/user/:id/delete', user.delete);
 
+app.get('/user/:id/events', function(req,res){
+  	driverClass.findByUser(req.params.id, function(err, drivers){
+  		riderClass.findByUser(req.params.id, function(error, riders){
+  			res.render('user_events',
+		        { locals: {
+					drivers: drivers,
+					riders: riders,
+					user:req.user,
+					title:"my Events"
+		        	}
+				});
 
 
+
+  		});
+    });
+});
+
+app.get('/user/:id/drivers', function(req,res){
+  	driverClass.findByUser(req.params.id, function(err, drivers){
+  		res.send(drivers);
+    });
+});
+
+
+app.get('/user/:id/riders', function(req,res){
+  	riderClass.findByUser(req.params.id, function(err, riders){
+  		res.send(riders);
+    });
+});
 
 
 
 //CRUD for events
 
 app.get('/events', event.list);
+//google maps request, pass in location  of all events
 
 //new event
 // app.get('/event/new', ensureAuthenticated, function(req,res){
@@ -233,41 +265,42 @@ app.post('/event/new', event.create);
 
 
 app.get('/event/:id', function(req,res){
+	//pass in/ajax a google maps -- would need to get location of each rider and driver, then routes of those connected
+	//weird how it doesn't always load on page
     eventClass.findById(req.params.id, function(error, event_obj) {
-    	var creator;
-    	console.log(event_obj.created_by_id);
-
-    	// userClass.findById(event_obj.created_by_id, function(error, user) {
-     //    creator=user;
-    	// });
 
 
-    	//console.log(creator);
+    	//console.log(event_obj.created_by_id.toString());
 
-		driverClass.findByEvent(req.params.id, function(error,driver_arr){
-			riderClass.findByEvent(req.params.id, function(error,rider_arr){
-				//one more for carpools
-				res.render('event_show',
-		        { locals: {
-					name: event_obj.name,
-					date: event_obj.date,
-					location: event_obj.location,
-					start_time: event_obj.start_time,
-					end_time: event_obj.end_time,
-					description: event_obj.description,
-					id:event_obj._id,
-					created_by: null,
-					drivers: driver_arr,
-					riders:rider_arr,
-					user:req.user,
-					title:event_obj.name
-		        	}
-		        });
-		      });
+    	 userClass.findById(event_obj.created_by_id, function(error, creator) {
+    	 	//console.log(creator);
 
-		});
+			res.render('event_show',
+	        { locals: {
+				name: event_obj.name,
+				date: event_obj.date,
+				location: event_obj.location,
+				start_time: event_obj.start_time,
+				end_time: event_obj.end_time,
+				description: event_obj.description,
+				id:event_obj._id,
+				created_by: creator,
+				user:req.user,
+				title:event_obj.name
+	        	}
+			});
+		 });
 
     });
+
+});
+
+app.get('/event/:id/info', function(req,res){
+    eventClass.findById(req.params.id, function(error, event_obj) {
+    	res.send(event_obj);
+
+    });
+
 });
 
 //update a event
@@ -309,13 +342,41 @@ app.get('/riders', function(req,res){//to be deleted later
 	});
 
 
+app.get('/event/:id/user', function(req,res){
+	var user=req.user;
+	if(user){//user object is there
 
+		driverClass.findByEventAndUser(req.params.id, user._id, function(err, driver){
+			if(err){res.send(err);}
+			if(driver){//the user is a driver
+				res.send(driver);
+			}else{//the user is not a driver
+				riderClass.findByEventAndUser(req.params.id, user._id, function(err, rider){
+					if(err){res.send(err);}
+					if(rider){
+						res.send(rider);//user is a rider
+					}else{
+						//user is neither a rider or a driver
+						var nothing =[];
+						res.send(null);
+					}
+				});
+			}
+		});
+	}else{
+		var nothing =[];
+		res.send(null);
+	}
+
+});
 
 
 // app.post('/event/:id/driver/new', ensureAuthenticated, function(req,res){
 app.post('/event/:id/driver/new', function(req,res){
 		driverClass.save({
-			user_id: req.user.id,
+			user_id: req.user._id,
+			first_name: req.user.first_name,
+			last_name: req.user.last_name,
 			event_id: req.params.id,
 			location: req.param('location'),
 			time: req.param('time'),
@@ -334,6 +395,8 @@ app.post('/event/:id/rider/new', function(req,res){
 			//eventClass.findById(req.params.id, function(err,result){ev=result;});
 		riderClass.save({
 			user_id: req.user._id,
+			first_name: req.user.first_name,
+			last_name: req.user.last_name,
 			event_id: req.params.id,
 			location: req.param('location'),
 			time: req.param('time'),
@@ -346,23 +409,67 @@ app.post('/event/:id/rider/new', function(req,res){
 });
 
 
-// app.get('/event/:event_id/carpool/:driver_id', function(req, res) {
+app.get('/event/:id/drivers', function(req, res) {
 
-//     driverClass.findById(req.params.driver_id, function(error, driver) {
-//         res.render('event_show',
-//         { locals: {
-// 			user: driver.user,
-// 			event: driver.event,
-// 			location: driver.location,
-// 			time: driver.time,
-// 			cap: driver.cap,
-// 			notes: driver.notes,
-// 			user:req.user,
-// 			title: 
-//         }
-//         });
-//     });
-// });
+    driverClass.findByEvent(req.params.id, function(error, drivers) {
+        res.send(drivers);//JSON array
+    });
+});
+
+app.get('/event/:id/riders', function(req, res) {
+
+    riderClass.findByEvent(req.params.id, function(error, riders) {
+        res.send(riders);//JSON array
+    });
+});
+
+app.get('/event/:event_id/driver/:driver_id', function(req, res) {
+
+	eventClass.findById(req.params.event_id, function(error, event_obj) {
+	    driverClass.findById(req.params.driver_id, function(error, driver) {
+	        riderClass.findByCarpoolDriver(req.params.driver_id, function(error, riders) {
+	        	res.render('event_ride.ejs', {locals:{
+					title: 'Ride for'+event_obj.name,
+					event: event_obj,
+					driver: driver,
+					riders: riders,
+					user:req.user
+					}
+	   			});
+	   		});
+	    });
+	});
+});
+
+
+app.get('/rider/:id/has_ride', function(req, res) {
+    carpoolClass.findRideForRider(req.params.id, function(error, carpools) {
+        res.send(carpools);
+    });
+});
+
+
+
+app.get('/driver/:id/rides', function(req, res) {
+    riderClass.findByCarpoolDriver(req.params.id, function(error, riders) {
+        res.send(riders);
+    });
+});
+
+
+app.get('/rider/:id', function(req, res) {
+
+    riderClass.findById(req.params.id, function(error, rider) {
+    	res.send(rider);
+    });
+});
+
+app.get('/driver/:id', function(req, res) {
+
+    driverClass.findById(req.params.id, function(error, driver) {
+    	res.send(driver);
+    });
+});
 
 
 
@@ -387,22 +494,6 @@ app.post('/event/:id/rider/new', function(req,res){
 // 	});
 // });
 
-// app.post('/event/:id/save', function(req, res) {
-// 	eventClass.update(req.param('_id'),{
-// 			name: req.param('name'),
-// 			date: req.param('date'),
-// 			location: req.param('location'),
-// 			start_time: req.param('start_time'),
-// 			end_time: req.param('end_time'),
-// 			description: req.param('description'),
-// 			id:req.param('_id'),
-// 			created_by:req.user
-// 	}, function(error, docs) {
-// 		res.redirect('/event/'+req.param('_id'));
-// 		//effed up
-// 	});
-// });
-
 
 app.post('/driver/:id/delete', function(req, res) {
 		driverClass.delete(req.param('_id'), function(error, docs) {
@@ -423,15 +514,23 @@ app.post('/rider/:id/delete', function(req, res) {
 app.post('/driver/:driver_id/rider/:rider_id/new', function(req,res){
 		carpoolClass.save({
 			driver_id: req.params.driver_id,
-			event_id: req.params.rider_id,
-			status: req.param('status'),
-			alert: "Pending"
+			rider_id: req.params.rider_id,
+			driver_accept: true,//req.param('driver_accept'),
+			rider_accept: true,//req.param('rider_accept'),
+			status: "accepted"
 		}, function(err, docs){
 			res.redirect('back');
 			//effed up
 		});
 		//});
 	});
+
+app.post('/carpool/:id/delete', function(req, res) {
+		carpoolClass.delete(req.param('_id'), function(error, docs) {
+			res.redirect('/events');
+			//effed up
+		});
+});
 
 
 

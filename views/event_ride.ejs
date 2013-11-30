@@ -1,0 +1,41 @@
+<% layout('layout') -%>
+ 
+    <div class="container">
+        <div>
+            <p>Event Name:  <%=event.name%></p>
+        </div>
+        <div>
+            <p>Date:  <%=event.date%></p>
+        </div>
+        <div>
+            <p>Location:  <%=event.location%></p>
+        </div>
+        <div>
+            <p>Start Time:  <%=event.start_time%></p>
+        </div>
+        <img id="index_img" src="/images/holder.jpg" alt="Welcome">
+
+        <ul data-role="listview" data-inset="true">
+            <%=%>
+            <li data-role="list-divider">Driver</li>
+            <li>
+                <a href="/user/<%=driver.user_id%>"><h2><%= driver.first_name%> <%=driver.last_name%></h2>
+                <p><strong><%=driver.location%></strong></p>
+                <p><%=driver.notes%></p>
+                <p class="ui-li-aside"><strong><%=driver.time%></strong></p>
+                </a>
+            </li>
+            <li data-role="list-divider">Riders<span class="ui-li-count"><%=riders.length%></span></li>
+            <% for(obj in riders){ var rider=riders[obj];%>
+            <li>
+                <a href="/user/<%=rider.user_id%>"><h2><%= rider.first_name%> <%=rider.last_name%></h2>
+                <p><strong><%=rider.location%></strong></p>
+                <p><%=rider.notes%></p>
+                <p class="ui-li-aside"><strong><%=rider.time%></strong></p>
+                </a>
+            </li>
+            <% } %>
+        </ul>
+
+
+    </div>

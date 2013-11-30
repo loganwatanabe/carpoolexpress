@@ -31,6 +31,7 @@ exports.new = function(req, res){
 
 
 exports.create = function(req, res){
+	console.log(req.user._id);
 		eventClass.save({
 			name: req.param('name'),
 			location: req.param('location'),
@@ -38,7 +39,7 @@ exports.create = function(req, res){
 			start_time: req.param('start_time'),
 			end_time: req.param('end_time'),
 			description: req.param('description'),
-			created_by_id: req.user._id
+			created_by_id: req.param('user_id')
 		}, function(err, docs){
 			res.redirect('/events');
 			//effed up

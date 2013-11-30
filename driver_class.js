@@ -71,6 +71,39 @@ DriverClass.prototype.findByEvent = function(eventID, callback) {
     });
 };
 
+DriverClass.prototype.findByUser = function(userID, callback) {
+    this.getCollection(function(error, driver_collection) {
+      if( error ) callback(error)
+      else {
+        driver_collection.find({user_id: driver_collection.db.bson_serializer.ObjectID.createFromHexString(userID)}).toArray(function(error, results) {
+          if( error ){
+            callback(error);
+          }
+          else{
+            callback(null, results);
+          }
+        });
+      }
+    });
+};
+
+DriverClass.prototype.findByEventAndUser = function(eventID, userID, callback) {
+    this.getCollection(function(error, driver_collection) {
+      if( error ) callback(error)
+      else {
+        driver_collection.findOne({event_id: eventID, user_id:userID}, function(error, results) {
+          if( error ){
+            callback(error);
+          }
+          else{
+            callback(null, results);
+          }
+        });
+      }
+    });
+};
+
+
 //save new driver
 DriverClass.prototype.save = function(drivers, callback) {
     this.getCollection(function(error, driver_collection) {

@@ -6,9 +6,11 @@
         <div>
             <p>Username:  <%=username%></p>
         </div>
+    <% if(authorized){ %>
         <div>
             <p>Password:  <%=password%></p>
         </div>
+    <% } %>
         <div>
             <p>First Name:  <%=first_name%></p>
         </div>
@@ -21,20 +23,25 @@
         <div>
             <p>Contact Info:  <%=contact%></p>
         </div>
-        <a href= <%= "/user/"+id+"/edit"%> data-role="button" data-inline="true" data-mini="true" data-theme="b">Edit</a>
-        <br>
-        <% if(fb_id == null || fb_id == undefined){ %>
-        <form method="post" action=<%= "/user/"+id+"/delete"%>>
-            <input name="_id" type="hidden" value=<%=id%>>
-            <input data-role="button" data-inline="true" data-mini="true" data-theme="e" id="delete" name="delete" value="Delete" type="submit">
 
-        </form>
-        <% }else{ %>
-        <script src="/javascripts/user_view.js"></script>
-        <form method="delete" action="<%=fb_id%>/permissions">
-            <input name="access_token" type="hidden" value=<%=accessToken%>>
-            <input data-role="button" data-inline="true" data-mini="true" data-theme="e" id="deletefb" name="delete" value="Delete Account & Revoke FB Access" type="submit">
+        <% if(authorized){ %>
+            <a href= <%= "/user/"+id+"/edit"%> data-role="button" data-inline="true" data-mini="true" data-theme="b">Edit</a>
+            <br>
+            <% if(fb_id == null || fb_id == undefined){ %>
+            <form method="post" action=<%= "/user/"+id+"/delete"%>>
+                <input name="_id" type="hidden" value=<%=id%>>
+                <input data-role="button" data-inline="true" data-mini="true" data-theme="e" id="delete" name="delete" value="Delete" type="submit">
 
-        </form>  
+            </form>
+            <% }else{ %>
+            <script src="/javascripts/user_view.js"></script>
+            <form method="delete" action="<%=fb_id%>/permissions">
+                <input name="access_token" type="hidden" value=<%=accessToken%>>
+                <input data-role="button" data-inline="true" data-mini="true" data-theme="e" id="deletefb" name="delete" value="Delete Account & Revoke FB Access" type="submit">
+
+            </form>
+            <% } %>
         <% } %>
+
+
     </div>

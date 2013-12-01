@@ -1,7 +1,7 @@
 {
   "name": "lwatanab-demo",
   "subdomain": "lwatanab",
-  "version": "0.0.0-42",
+  "version": "0.0.0-44",
   "engines": {
     "node": "v0.8.x"
   },
@@ -22,6 +22,6 @@
     "express-helpers": "1.3.1",
     "async-foreach": "*",
     "googlemaps": "*",
-    "util":"*"
+    "util": "*"
   }
 }

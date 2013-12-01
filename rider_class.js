@@ -79,7 +79,7 @@ RiderClass.prototype.findByUser = function(userID, callback) {
     this.getCollection(function(error, rider_collection) {
       if( error ) callback(error)
       else {
-        rider_collection.find({user_id: rider_collection.db.bson_serializer.ObjectID.createFromHexString(userID)}).toArray(function(error, results) {
+        rider_collection.find({user_id: userID}).toArray(function(error, results) {
           if( error ){
             callback(error);
           }

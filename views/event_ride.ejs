@@ -1,5 +1,8 @@
 <% layout('layout') -%>
- 
+
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAnhJ9slS6FaJpwogrvb5SJtEGohVY7cns&sensor=true"></script>
+    <script src="/javascripts/car_gmap.js"></script>
+
     <div class="container">
         <div>
             <p>Event Name:  <%=event.name%></p>
@@ -13,7 +16,7 @@
         <div>
             <p>Start Time:  <%=event.start_time%></p>
         </div>
-        <img id="index_img" src="/images/holder.jpg" alt="Welcome">
+        <div id="googleMap" style="width:500px;height:380px;"></div>
 
         <ul data-role="listview" data-inset="true">
             <%=%>
@@ -25,7 +28,7 @@
                 <p class="ui-li-aside"><strong><%=driver.time%></strong></p>
                 </a>
             </li>
-            <li data-role="list-divider">Riders<span class="ui-li-count"><%=riders.length%></span></li>
+            <li data-role="list-divider">Riders<span class="ui-li-count"><%=riders.length%>/<%=driver.cap%></span></li>
             <% for(obj in riders){ var rider=riders[obj];%>
             <li>
                 <a href="/user/<%=rider.user_id%>"><h2><%= rider.first_name%> <%=rider.last_name%></h2>

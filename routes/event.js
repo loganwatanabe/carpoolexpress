@@ -31,7 +31,7 @@ exports.new = function(req, res){
 
 
 exports.create = function(req, res){
-	console.log(req.user._id);
+	
 		eventClass.save({
 			name: req.param('name'),
 			location: req.param('location'),
@@ -39,81 +39,85 @@ exports.create = function(req, res){
 			start_time: req.param('start_time'),
 			end_time: req.param('end_time'),
 			description: req.param('description'),
-			created_by_id: req.param('user_id')
+			created_by_id: req.user._id.toString()
 		}, function(err, docs){
 			res.redirect('/events');
 			//effed up
 		});
 };
 
-exports.get = function(req, res){//replace with working code
-  //   eventClass.findById(req.params.id, function(error, event) {
+exports.get = function(req, res){
 
-  //   	var creator;
-  //   	userClass.findById(event.created_by_id, function(err,result){creator=result});
-  //   	console.log(creator);
 
-  //   	var driver_coll;
-		// driverClass.findByEvent(event._id, function(error,result){driver_coll=result});
-  //       res.render('event_show',
-  //       { locals: {
-		// 	name: event.name,
-		// 	date: event.date,
-		// 	location: event.location,
-		// 	start_time: event.start_time,
-		// 	end_time: event.end_time,
-		// 	description: event.description,
-		// 	id:event._id,
-		// 	created_by: creator,
-		// 	drivers:driver_coll,
-		// 	user:req.user,
-		// 	title:event.name
-  //       }
-  //       });
-  //               //console.log(driver_coll);
-  //   });
 };
 
 
 exports.edit = function(req, res){
 	eventClass.findById(req.params.id, function(error, event) {
-		res.render('event_edit',
-		{ locals: {
-			name: event.name,
-			date: event.date,
-			location: event.location,
-			start_time: event.start_time,
-			end_time: event.end_time,
-			description: event.description,
-			id:event._id,
-			user:req.user,
-			title:event.name
-        }
-		});
+		if(error){res.redirect('/events');}
+		else{
+			if(req.user._id.toString()==event.created_by_id){
+				res.render('event_edit',
+				{ locals: {
+					name: event.name,
+					date: event.date,
+					location: event.location,
+					start_time: event.start_time,
+					end_time: event.end_time,
+					description: event.description,
+					id:event._id,
+					user:req.user,
+					title:event.name
+		        }
+				});
+			}else{
+				console.log('you are not authorized to edit');
+				res.redirect('/events');
+			}
+		}
 	});
 };
 
 exports.update = function(req, res){
-	eventClass.update(req.param('_id'),{
-			name: req.param('name'),
-			date: req.param('date'),
-			location: req.param('location'),
-			start_time: req.param('start_time'),
-			end_time: req.param('end_time'),
-			description: req.param('description'),
-			id:req.param('_id')
-			//created_by_id:req.user._id
-	}, function(error, docs) {
-		res.redirect('/event/'+req.param('_id'));
-		//effed up
+	eventClass.findById(req.params.id, function(error, event) {
+		if(error){res.redirect('/events');}
+		else{
+			if(req.user._id.toString()==event.created_by_id){
+				eventClass.update(req.params.id,{$set:{
+						name: req.param('name'),
+						date: req.param('date'),
+						location: req.param('location'),
+						start_time: req.param('start_time'),
+						end_time: req.param('end_time'),
+						description: req.param('description')
+						// created_by_id:req.user._id.toString()
+				}}, function(error, docs) {
+					res.redirect('/event/'+req.params.id);
+					//effed up
+				});
+			}else{
+				console.log('you are not authorized to edit');
+				res.redirect('/events');
+			}
+		}
 	});
 };
 
 exports.delete = function(req, res){
-		eventClass.delete(req.param('_id'), function(error, docs) {
-			res.redirect('/events');
-			//effed up
-		});
+	eventClass.findById(req.params.id, function(error, event) {
+		if(error){res.redirect('/events');}
+		else{
+			if(req.user._id.toString()==event.created_by_id){
+				eventClass.delete(req.param('_id'), function(error, docs) {
+					res.redirect('/events');
+					//effed up
+				});
+			}else{
+				console.log('you are not authorized to delete');
+				res.redirect('/events');
+			}
+		}
+	});
 };
 
 

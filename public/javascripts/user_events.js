@@ -1,3 +1,4 @@
+// $(document).on("pageinit", "#user_events", function() { //document is loaded and ready
 $(function() { //document is loaded and ready
 
 	var url_drivers = $(location).attr('pathname').replace("/events","/drivers");
@@ -42,7 +43,7 @@ $(function() { //document is loaded and ready
 					if(!carpool){	
 
 						input+='<p>You have no ride.</p></a></li>';
-						$("#list_events").append(input);
+						$("#list_events").append(input).trigger("create").listview("refresh");
 					}
 					else{
 						$.get('/driver/'+carpool.driver_id, function(driver){

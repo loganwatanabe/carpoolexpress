@@ -1,5 +1,9 @@
 <% layout('layout') -%>
+<!--div data-role="page" id="event_show"--> 
+
 <script src="/javascripts/event.js"></script>
+<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAnhJ9slS6FaJpwogrvb5SJtEGohVY7cns&sensor=true"></script>
+<script src="/javascripts/event_gmap.js"></script>
     
     <div class="container">
         <h1><%= name %></h1>
@@ -13,7 +17,7 @@
         <div>
             <p>Date:  <%=date%></p>
         </div>
-        <img id="index_img" src="/images/holder.jpg" alt="Welcome">
+        <div id="googleMap" style="width:500px;height:380px;"></div>
         <div>
             <p>Location:  <%=location%></p>
         </div>
@@ -27,50 +31,64 @@
             <p>Description:  <%=description%></p>
         </div>
 
-        <a href="#popupRSVP" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-icon="check" data-theme="b" data-transition="pop">RSVP</a>
-        <div data-role="popup" id="popupRSVP" data-theme="a" data-overlay-theme="a" class="ui-corner-all">
+        <% if(user){ %>
+        <div id="RSVPbutton">
+            <a href="#popupRSVP" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-icon="check" data-theme="b" data-transition="pop">RSVP</a>
+            <div data-role="popup" id="popupRSVP" data-theme="a" data-overlay-theme="a" class="ui-corner-all">
 
-                <div style="padding:10px 20px;">
-                    <h3>RSVP</h3>
-                            <form>
-                                <legend>How will you get there?</legend>
-                                <label>
-                                    <input type="radio" name="role" id="driver">Driver
-                                </label>
-                                <label for="rider">Rider</label>
-                                <input type="radio" name="role" id="rider" class="custom">
-                            </form>
-                    <form id="RSVPform"  action="/event/<%=id%>/role/new" method="post">
-                        <legend>Where from?</legend>
-                        <label for="location" class="ui-hidden-accessible">Location:</label>
-                        <input type="text" name="location" id="location" value="" placeholder="Location" data-theme="b">
+                    <div style="padding:10px 20px;">
+                        <h3>RSVP</h3>
+                                <form>
+                                    <legend>How will you get there?</legend>
+                                    <label>
+                                        <input type="radio" name="role" id="driver">Driver
+                                    </label>
+                                    <label for="rider">Rider</label>
+                                    <input type="radio" name="role" id="rider" class="custom">
+                                </form>
+                        <form id="RSVPform"  action="/event/<%=id%>/role/new" method="post">
+                            <legend>Where from?</legend>
+                            <label for="location" class="ui-hidden-accessible">Location:</label>
+                            <input type="text" name="location" id="location" value="" placeholder="Location" data-theme="b">
 
-                        <legend>What time?</legend>
-                        <label for="time" class="ui-hidden-accessible">Time:</label>
-                        <input type="time" name="time" id="time" value="" placeholder="Leave Time" data-theme="b">
+                            <legend>What time?</legend>
+                            <label for="time" class="ui-hidden-accessible">Time:</label>
+                            <input type="time" name="time" id="time" value="" placeholder="Leave Time" data-theme="b">
 
-                        <div id="jq-insert">
-                        </div>
+                            <div id="jq-insert">
+                            </div>
 
-                        <legend>Notes</legend>
-                        <label for="notes" class="ui-hidden-accessible">Ride Notes:</label>
-                        <textarea name="notes" id="notes" value="" placeholder="Ride Notes" data-theme="b"></textarea>
+                            <legend>Notes</legend>
+                            <label for="notes" class="ui-hidden-accessible">Ride Notes:</label>
+                            <textarea name="notes" id="notes" value="" placeholder="Ride Notes" data-theme="b"></textarea>
 
-                        <input id="subm" type="submit" data-theme="b" data-icon="check" value="RSVP">
+                            <input id="subm" type="submit" data-theme="b" data-icon="check" value="RSVP">
 
-                </div>
-                    </form>
+                    
+                        </form>
+                    </div>
+            </div>
         </div>
+        <% }else{ %>
 
+
+            <a href="#" data-inline="true" data-theme="b" data-role="button" class="ui-disabled">Log in to RSVP</a>
+
+
+        <% } %>
+
+        <% if(authorized){ %>
         <a href= <%= "/event/"+id+"/edit"%> data-role="button" data-inline="true" data-mini="true" data-theme="b">Edit</a>
         <br>
         <form method="post" action=<%= "/event/"+id+"/delete"%>>
             <input name="_id" type="hidden" value=<%=id%>>
             <input data-role="button" data-inline="true" data-mini="true" data-theme="e" id="delete" name="delete" value="Delete" type="submit">
         </form>
-
+        <% } %>
         <div id="load_cars"></div>
         <div id="stranded_riders" class="ui-grid-d"></div>
 
 
     </div>
+
+<!--/div-->

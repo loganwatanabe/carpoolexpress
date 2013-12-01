@@ -75,7 +75,7 @@ DriverClass.prototype.findByUser = function(userID, callback) {
     this.getCollection(function(error, driver_collection) {
       if( error ) callback(error)
       else {
-        driver_collection.find({user_id: driver_collection.db.bson_serializer.ObjectID.createFromHexString(userID)}).toArray(function(error, results) {
+        driver_collection.find({user_id: userID}).toArray(function(error, results) {
           if( error ){
             callback(error);
           }

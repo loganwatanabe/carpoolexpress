@@ -439,7 +439,7 @@ app.get('/driver/:driver_id/car', function(req, res) {
     	eventClass.findById(driver.event_id, function(error, event_obj) {
 	        riderClass.findByCarpoolDriver(req.params.driver_id, function(error, riders) {
 	        	res.render('event_ride.ejs', {locals:{
-					title: 'Ride for'+event_obj.name,
+					title: 'Ride for '+event_obj.name,
 					event: event_obj,
 					driver: driver,
 					riders: riders,

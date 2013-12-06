@@ -6,31 +6,33 @@
 <script src="/javascripts/event_gmap.js"></script>
     
     <div class="container">
-        <h1><%= name %></h1>
-
-        <div>
-            <p>Event Name:  <%=name%></p>
+        <br>
+        <div id="googleMap" style="width:500px;height:380px;text-align:center;"></div>
+        <div id="event_description_block">
+            <div id="event_desc_top">
+            <div id="event_head">
+                <p><h2><%=name%></h2>
+                Created By:  <a href="/user/<%=created_by._id%>"><%=created_by.first_name + " " + created_by.last_name%></a></p>
+            </div>
+            <div id="event_des">
+                <br>
+                <p>Date:  <%=date%>
+                <br>
+                Start Time:  <%=start_time%>
+                <br>
+                End Time:  <%=end_time%></p>
+            </div>
+            </div>
+            <div style="clear:both;"></div>
+                <hr>
+            <div>
+                <p>Location:  <%=location%></p>
+            </div>
+                <hr>
+            <div>
+                <p>Description:  <%=description%></p>
+            </div>
         </div>
-        <div>
-            <p>Created By:  <a href="/user/<%=created_by._id%>"><%=created_by.first_name + " " + created_by.last_name%></a></p>
-        </div>
-        <div>
-            <p>Date:  <%=date%></p>
-        </div>
-        <div id="googleMap" style="width:500px;height:380px;"></div>
-        <div>
-            <p>Location:  <%=location%></p>
-        </div>
-        <div>
-            <p>Start Time:  <%=start_time%></p>
-        </div>
-        <div>
-            <p>End Time:  <%=end_time%></p>
-        </div>
-        <div>
-            <p>Description:  <%=description%></p>
-        </div>
-
         <% if(user){ %>
         <div id="RSVPbutton">
             <a href="#popupRSVP" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-icon="check" data-theme="b" data-transition="pop">RSVP</a>
@@ -85,9 +87,15 @@
             <input data-role="button" data-inline="true" data-mini="true" data-theme="e" id="delete" name="delete" value="Delete" type="submit">
         </form>
         <% } %>
-        <div id="load_cars"></div>
-        <div id="stranded_riders" class="ui-grid-d"></div>
 
+        <div id="guest-list">
+            
+            <div id="load_cars"><h3 style="float:left;">Cars:</h3><div style="clear:both;"></div>
+            </div>
+
+            <div id="rider-box"><h3 style="float:left;">Riders:</h3><div style="clear:both;"></div>
+                <div id="stranded_riders" class="border-block ui-corner-all ui-grid-d"></div>
+            </div>
 
     </div>
 

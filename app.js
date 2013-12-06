@@ -457,8 +457,15 @@ app.get('/event/:id/coords', function(req,res){
 	eventClass.findById(req.params.id, function(err, event){
 
 		googlemaps.geocode(event.location, function(err, event_geo){
+			if(event_geo){
 			var coords=event_geo.results[0].geometry.location;
 			res.send(coords);
+			}else{
+				eventClass.update(req.params.id,{$set:{
+						location: 'Cannot recognize location: please re-enter'
+						// created_by_id:req.user._id.toString()
+				}}, function(error, docs) {});
+			}
 		});
 
 	});
@@ -468,8 +475,15 @@ app.get('/rider/:id/coords', function(req,res){
 	riderClass.findById(req.params.id, function(err, rider){
 
 		googlemaps.geocode(rider.location, function(err, rider_geo){
+			if(rider_geo){
 			var coords=rider_geo.results[0].geometry.location;
 			res.send(coords);
+			}else{
+				riderClass.update(req.params.id,{$set:{
+						location: 'Cannot recognize location: please re-enter'
+						// created_by_id:req.user._id.toString()
+				}}, function(error, docs) {});
+			}
 		});
 	});
 });
@@ -478,8 +492,17 @@ app.get('/driver/:id/coords', function(req,res){
 	driverClass.findById(req.params.id, function(err, driver){
 
 		googlemaps.geocode(driver.location, function(err, driver_geo){
+			if(driver_geo){
 			var coords=driver_geo.results[0].geometry.location;
 			res.send(coords);
+			}else{
+				driverClass.update(req.params.id,{$set:{
+						location: 'Cannot recognize location: please re-enter'
+						// created_by_id:req.user._id.toString()
+				}}, function(error, docs) {
+					res.send(null);
+				});
+			}
 		});
 	});
 });
@@ -697,4 +720,12 @@ function ensureAuthenticated(req, res, next) {
 function ensureNotAuthenticated(req, res, next) {
   if (!req.isAuthenticated()) { return next(); }
   res.redirect('/')
+}
+
+function format_date(date){
+
+}
+
+function format_time(time){
+	
 }

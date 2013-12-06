@@ -40,21 +40,21 @@ $.get(url_user, function(role_obj, status){
 
 	$.get(url_drivers, function(drivers,stat){//drivers is an array
 		var count=1;
+
 		if(drivers.length==0){
 			$("#load_cars").append('<h1>No drivers have RSVPd yet</h1>').trigger("create");;
 		}
 		else{
 
-
-			for(var ii=0; ii<drivers.length;ii++){ 
+			for(var ii=0; ii<drivers.length;ii++){
+				$.get("/driver/"+drivers[ii]._id, function(driver, er){
 				var input = "";
-				var driver=drivers[ii];
 				var row="odd";
-				if(count%2==0){row="even";}
+				//if(count%2==0){row="even";}
 
 				//add driver tile here
-				input+='<div class="ui-grid-d row-'+ row +'"">';
-				input+='<div class="ui-block-a">';
+				input+='<div class="ui-corner-all border-block ui-grid-d row-'+ row +'"">';
+				input+='<div class="ride-tile my-breakpoint ui-block-a">';
 				input+='<p><img src="/images/driver.png" style="width:40px; height:40px; float:left;"></p>';
 	            input+='<p class="tile_words"><a href="/user/'+driver.user_id+'">'+driver.first_name+' '+driver.last_name+'</a><br>'+driver.time+'&nbsp;&nbsp;'+driver.location+'<br>'+driver.notes;
 	            var link = "/driver/"+driver._id+"/car";
@@ -63,7 +63,7 @@ $.get(url_user, function(role_obj, status){
 	            if(role_obj._id == driver._id){//only the driver can see this
 	            	
 	            	input+='<a href="#'+driver._id+'" data-rel="popup" data-position-to="window" data-mini="true" data-role="button" data-inline="true" data-icon="gear" data-theme="a" data-transition="pop">Change</a>';
-					input+='<div data-role="popup" id="'+driver._id+'" data-theme="a" class="ui-corner-all">';
+					input+='<div data-role="popup" id="'+driver._id+'" data-theme="a">';
 					    input+='<form id="driver_edit" action="/driver/'+driver._id+'/edit" method="post"><div style="padding:10px 20px;">';
 					            input+='<h3>Change RSVP</h3>';
 					            input+='<legend>Where from?</legend><input type="text" name="location" id="location" value="'+driver.location+'" placeholder="Location" data-theme="b">';
@@ -83,14 +83,14 @@ $.get(url_user, function(role_obj, status){
 	                            
 					var cc=98;
 					$.get("/driver/"+driver._id+"/rides", function(riders){//pass in all a driver's carpools
-						
+						console.log(riders);
 						//AJAX for-loop
 						for(var jj=0; jj<riders.length;jj++){
 
 							var rider=riders[jj];
 								if(cc>101){cc=97;}
 									//add rider tiles here
-									input+='<div class="ui-block-'+String.fromCharCode(cc)+'"">';
+									input+='<div class="ride-tile my-breakpoint ui-block-'+String.fromCharCode(cc)+'"">';
 									input+='<p><img src="/images/rider.png" style="width:40px; height:40px;float:left;"></p>';
 	                				input+='<p class="tile_words"><a href="/user/'+rider.user_id+'">'+rider.first_name+' '+rider.last_name+'</a><br>'+rider.location;
 	                				
@@ -128,7 +128,7 @@ $.get(url_user, function(role_obj, status){
 						for(var kk=0; kk<spaces;kk++){
 							if(cc>101){cc=97;}
 							//add empty tiles here
-							input+='<div class="ui-block-'+String.fromCharCode(cc)+'">';
+							input+='<div class="ride-tile my-breakpoint ui-block-'+String.fromCharCode(cc)+'"><div class="blank-tile">';
 							input+='<p><img src="/images/empty.png" style="width:40px; height:40px;float:left;"></p>';
 							//button
 							if(role_obj.role == "rider" && role_obj.ride==false){
@@ -140,17 +140,17 @@ $.get(url_user, function(role_obj, status){
 					            input+= '<input type="submit" data-theme="b" data-mini="true" data-role="button" data-inline="true" value="Request a Ride"></form></p>';
 	        				}
 
-	        				input+='</div>';
+	        				input+='</div></div>';
 	        				cc++;
 						}
 						//jquery to push button created above
 						//inject whole thing into DOM here
-						input+="</div>";
+						input+="</div></div>";
 						$("#load_cars").append(input).trigger("create");
 					});
-
+				});
 				count++;
-			}//function
+			}//for loop
 		}	
 
 	});//load cars
@@ -171,27 +171,33 @@ $.get(url_user, function(role_obj, status){
 			var input="";
 			if(index<riders.length){
 				$.get("/rider/"+riders[index]._id+"/has_ride", function(cp_or_null, diditwork){
-						if(cp_or_null){
+						//if(cp_or_null){
 							//this means the rider has a ride, do nothing
-						}
-						else{//rider does not have a ride(ie cp_or_null is null)
+							//class="ui-disabled"
+
+
+
+						//}
+						//else{//rider does not have a ride(ie cp_or_null is null)
 							//insert the DOM elements into #stranded_riders
 							var rider=riders[index];
 							if(cc>101){cc=97;}
-							input+='<div class="ui-block-'+String.fromCharCode(cc)+'"">';
+							input+='<div class="ride-tile ';
+							if(cp_or_null){input+='ui-disabled';}
+							input+=' my-breakpoint ui-block-'+String.fromCharCode(cc)+'"">';
 							input+='<p><img src="/images/rider.png" style="width:40px; height:40px;float:left;"></p>';
 			                input+='<p class="tile_words"><a href="/user/'+rider.user_id+'">'+rider.first_name+' '+rider.last_name+'</a><br>'+rider.time+" "+rider.location;
 							input+='<br>'+rider.notes;
 
 			                //drivers only
-			                if(role_obj.role=="driver"){
+			                if(role_obj.role=="driver" && !cp_or_null){
 								input+= '<form action="/driver/'+role_obj._id+'/rider/'+rider._id+'/new" method="post">';
 	            				input+= '<input type="hidden" name="driver_accept" value="true">';
 	            				input+= '<input type="hidden" name="rider_accept" value="">';
 					            input+= '<input type="submit" data-theme="b" data-mini="true" data-role="button" data-inline="true" value="Offer a Ride"></form>';
 					        }
 					        //riders only
-					        if(role_obj._id == rider._id){//only the rider sees this
+					        if(role_obj._id == rider._id && !cp_or_null){//only the rider sees this
 					        	input+='<br><a href="#'+rider._id+'" data-rel="popup" data-position-to="window" data-mini="true" data-role="button" data-inline="true" data-icon="gear" data-theme="a" data-transition="pop">Change</a>';
 								input+='<div data-role="popup" id="'+rider._id+'" data-theme="a" class="ui-corner-all">';
 								    input+='<form id="rider_edit" action="/rider/'+rider._id+'/edit" method="post"><div style="padding:10px 20px;">';
@@ -211,7 +217,7 @@ $.get(url_user, function(role_obj, status){
 			                cc++;
 			                //inserting into DOM here
 			                $("#stranded_riders").append(input).trigger("create");
-			            }
+			            //}
 				});
 			}
 		}
@@ -221,7 +227,7 @@ $.get(url_user, function(role_obj, status){
 			}
 
 			if(riders.length==0){
-				$("#stranded_riders").append("<h1>No riders have RSVPd yet</h1>").trigger("create");
+				$("#rider-box").append("<h1>No riders have RSVPd yet</h1>").trigger("create");
 			}
 
 	});//loads stranded riders

@@ -26,7 +26,7 @@ $(function()
 			var map = new google.maps.Map(document.getElementById("googleMap")//jquery here?
 			  ,mapProp);
 
-			var directionsService = new google.maps.DirectionsService();
+			
 			var directionsDisplay = new google.maps.DirectionsRenderer();
 
 
@@ -49,7 +49,7 @@ $(function()
 
 			attachInstructionText(event_marker, event_obj.name + "<br>" + event_obj.location);
 
-			directionsDisplay.setMap(map);
+			//directionsDisplay.setMap(map);
 			//at this point google map is centered on event, with a marker
 
 			//now we'll try to add in stranded riders
@@ -96,12 +96,19 @@ $(function()
 	$.get(url_drivers, function(drivers,stat){//drivers is an array
 
 
-		for(var ii=0; ii<drivers.length;ii++){ 
-			var driver=drivers[ii];
+		for(var ii=0; ii<drivers.length;ii++){
+			$.get("/driver/"+drivers[ii]._id, function(driver, e){
+
 
 			$.get('/driver/'+driver._id+'/route_req', function(requ, status){
+
+
+				var directionsDisplay = new google.maps.DirectionsRenderer();
+				directionsDisplay.setMap(map);
+
 				// directionsDisplay.setDirections(response);
 				requ.travelMode = google.maps.TravelMode.DRIVING;
+				var directionsService = new google.maps.DirectionsService();
 
 				directionsService.route(requ, function(response, status) {
 				    if (status == google.maps.DirectionsStatus.OK) {
@@ -125,7 +132,7 @@ $(function()
 			});
 
 
-
+		});
 		}//for each driver
 
 	});//load cars

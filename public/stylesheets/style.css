@@ -17,6 +17,9 @@ a {
 }
 
 
+.center-this{
+	text-align: center;
+}
 
 /**For the event show page**/
 .row-odd{
@@ -98,6 +101,18 @@ a {
 	margin-top: 10px;
 }
 
+#googleMap{
+	width:500px;
+	height:380px;
+	text-align:center;
+}
+
+.index-button{
+	width: 80%;
+	padding-left: 10%;
+	padding-right: 10%;
+
+}
 
 
 
@@ -127,6 +142,52 @@ a {
 
 /* stack all grids below 40em (640px) */
 @media all and (max-width: 800px) {
+	body{
+		width: 100%;
+		margin: 0;
+		padding: 0;
+		
+	}
+
+	.ui-mobile-viewport, img{
+		width: 100%;
+	}
+
+	#event_description_block{
+		width:100%;
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	#event_desc_top{
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+
+	#event_head{
+		float: left;
+	}
+
+	#event_des{
+		float: right;
+	}
+
+	#googleMap{
+		width: 100%;
+		height: 300px;
+		text-align:center;
+		margin:0;
+		padding-left: 0;
+		padding-right: 0;
+	}
+	#rider-box, #load_cars{
+		width:100%;
+		padding:0;
+	}
+
+
+
 	.ui-grid-d>.ui-block-a,
 	.ui-grid-d>.ui-block-b,
 	.ui-grid-d>.ui-block-c,

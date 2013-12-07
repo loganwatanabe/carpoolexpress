@@ -2,6 +2,7 @@
 <!--no layout-->
 <html>
 <head>
+    <meta name="viewport" content="width=device-width">
         <link rel="stylesheet" href="/jquery.mobile-1.3.2/jquery.mobile-1.3.2.css" />
         <script src="/javascripts/jquery-1.10.2.min.js"></script>
     <script type="text/javascript">
@@ -13,16 +14,16 @@
          <link rel="stylesheet" href="/stylesheets/style.css" />
         <title><%= title %></title>
 </head>
-<body>
+<body style="text-align:center;">
     <div data-role="header">
-      <a href="/" data-icon="bars" class="ui-btn-left">Menu</a>
+      <a href="/" data-icon="home" class="ui-btn-left">Home</a>
       <h1><%=title%></h1>
     </div>
-    
+    <div id="container" style="padding-left:5%;padding-right:5%;">
     <form action="/register" method="post" data-mini="true">
         <div data-role="fieldcontain">
-            <label>Username:</label>
-            <input type="text" name="username"  id="username"/>
+            <label>Email:</label>
+            <input type="text" name="email" id="email"/>
         </div>
         <div data-role="fieldcontain">
             <label>Password:</label>
@@ -37,16 +38,13 @@
             <input type="text" name="last_name" id="last_name"/>
         </div>
         <div data-role="fieldcontain">
-            <label>Email:</label>
-            <input type="text" name="email" id="email"/>
-        </div>
-        <div data-role="fieldcontain">
             <label for="textarea">Contact Info:</label>
             <textarea name="contact" id="contact"></textarea>
         </div>
         <div>
-            <input type="submit" value="Register"/>
+            <input type="submit" data-theme="b" value="Register"/>
         </div>
     </form>
+    </div>
 </body>
 <html>

@@ -11,14 +11,20 @@ var riderClass = new RiderClass('localhost', 27017);
 
 
 exports.list = function(req, res){
-	eventClass.findAll(function(error, docs){
+	eventClass.findAll(function(error, events){
 			res.render('event_list.ejs', {locals:{
 				title: 'Events',
-				collection: docs,
+				collection: events,
 				user:req.user
 				}
 			});
 		})
+};
+
+exports.all = function(req, res){
+	eventClass.findAll(function(error, events){
+			res.send(events);
+		});
 };
 
 
@@ -42,7 +48,6 @@ exports.create = function(req, res){
 			created_by_id: req.user._id.toString()
 		}, function(err, docs){
 			res.redirect('/events');
-			//effed up
 		});
 };
 
@@ -93,7 +98,7 @@ exports.update = function(req, res){
 						// created_by_id:req.user._id.toString()
 				}}, function(error, docs) {
 					res.redirect('/event/'+req.params.id);
-					//effed up
+					
 				});
 			}else{
 				console.log('you are not authorized to edit');
@@ -110,11 +115,11 @@ exports.delete = function(req, res){
 			if(req.user._id.toString()==event.created_by_id){
 				eventClass.delete(req.param('_id'), function(error, docs) {
 					res.redirect('/events');
-					//effed up
+					
 				});
 			}else{
 				console.log('you are not authorized to delete');
-				res.redirect('/events');
+				res.redirect('/event/'+req.params.id);
 			}
 		}
 	});

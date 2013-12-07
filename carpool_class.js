@@ -54,6 +54,30 @@ CarpoolClass.prototype.findById = function(id, callback) {
     });
 };
 
+CarpoolClass.prototype.findByRider = function(riderID, callback) {
+    this.getCollection(function(error, carpool_collection) {
+      if( error ) callback(error)
+      else {
+        carpool_collection.find({rider_id: riderID}).toArray(function(error, results) {
+          if( error ) callback(error)
+          else callback(null, results)
+        });
+      }
+    });
+};
+
+CarpoolClass.prototype.findByDriver = function(driverID, callback) {
+    this.getCollection(function(error, carpool_collection) {
+      if( error ) callback(error)
+      else {
+        carpool_collection.find({driver_id: driverID}).toArray(function(error, results) {
+          if( error ) callback(error)
+          else callback(null, results)
+        });
+      }
+    });
+};
+
 //find a carpool by ID
 CarpoolClass.prototype.findRidesForDriver = function(driveID, callback) {
     this.getCollection(function(error, carpool_collection) {
@@ -127,6 +151,7 @@ CarpoolClass.prototype.update = function(carpoolId, carpools, callback) {
 
 //delete carpool
 CarpoolClass.prototype.delete = function(carpoolId, callback) {
+  console.log(carpoolId)
         this.getCollection(function(error, carpool_collection) {
                 if(error) callback(error);
                 else {

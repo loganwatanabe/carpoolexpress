@@ -8,6 +8,15 @@ var Connection = require('mongodb').Connection;
 var BSON = require('mongodb').BSON;
 var ObjectID = require('mongodb').ObjectID;
 
+var EventClass = require('./event_class').EventClass;
+var eventClass = new EventClass('localhost', 27017);
+
+var DriverClass = require('./driver_class').DriverClass;
+var driverClass = new DriverClass('localhost', 27017);
+
+var RiderClass = require('./rider_class').RiderClass;
+var riderClass = new RiderClass('localhost', 27017);
+
 
 UserClass = function(host, port){
 	var db = new mongodb.Db('nodejitsu_loganwatanabe_nodejitsudb9965101284',
@@ -57,12 +66,12 @@ UserClass.prototype.findById = function(id, callback) {
 };
 
 
-//find a user by username
-UserClass.prototype.findByUsernameOrEmail = function(usernameORemail, callback) {
+//find a user by email
+UserClass.prototype.findByEmail = function(email, callback) {
     this.getCollection(function(error, user_collection) {
       if( error ) callback(error)
       else {
-        user_collection.findOne( {$or: [{ username:usernameORemail },{ email: usernameORemail }]}
+        user_collection.findOne( { email: email }
           , function(error, result) {
           if( error ) callback(error)
           else callback(null, result)//returns a user
@@ -110,17 +119,37 @@ UserClass.prototype.update = function(userId, users, callback) {
 
 //delete user
 UserClass.prototype.delete = function(userId, callback) {
-        this.getCollection(function(error, user_collection) {
-                if(error) callback(error);
-                else {
-                        user_collection.remove(
-                                {_id: user_collection.db.bson_serializer.ObjectID.createFromHexString(userId)},
-                                function(error, user){
-                                        if(error) callback(error);
-                                        else callback(null, user)
-                                });
-                        }
+
+  this.getCollection(function(error, user_collection) {
+    if(error) callback(error);
+    else {
+
+      eventClass.findByUser(userId, function(er, events){
+        for(var ii=0; ii<events.length;ii++){
+         eventClass.delete(events[ii]._id.toString(), function(err, result){});
+        }
+
+        riderClass.findByUser(userId, function(err, riders){
+          for(var ii=0; ii<riders.length;ii++){
+            riderClass.delete(riders[ii]._id.toString(), function(err, result){});
+          }
+
+          driverClass.findByUser(userId, function(erro, drivers){
+            for(var ii=0; ii<drivers.length;ii++){
+              driverClass.delete(drivers[ii]._id.toString(), function(err, result){});
+            }
+          
+            user_collection.remove(
+                    {_id: user_collection.db.bson_serializer.ObjectID.createFromHexString(userId)},
+                    function(error, user){
+                            if(error) callback(error);
+                            else callback(null, user)
+                    });
+          });
         });
+      });
+    }
+  });
 };
 
 exports.UserClass = UserClass;

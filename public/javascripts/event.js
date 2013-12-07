@@ -56,7 +56,8 @@ $.get(url_user, function(role_obj, status){
 				input+='<div class="ui-corner-all border-block ui-grid-d row-'+ row +'"">';
 				input+='<div class="ride-tile my-breakpoint ui-block-a">';
 				input+='<p><img src="/images/driver.png" style="width:40px; height:40px; float:left;"></p>';
-	            input+='<p class="tile_words"><a href="/user/'+driver.user_id+'">'+driver.first_name+' '+driver.last_name+'</a><br>'+driver.time+'&nbsp;&nbsp;'+driver.location+'<br>'+driver.notes;
+				var d_time=moment(driver.time, "HH:mm").format("h:mm A");
+	            input+='<p class="tile_words"><a href="/user/'+driver.user_id+'">'+driver.first_name+' '+driver.last_name+'</a><br>'+d_time+'<br>'+driver.location+'<br>'+driver.notes;
 	            var link = "/driver/"+driver._id+"/car";
 	            input+='</p><p><a href="'+link+'" data-inline="true" data-mini="true" data-role="button">View Car</a>';
 
@@ -71,10 +72,18 @@ $.get(url_user, function(role_obj, status){
 								input+='<legend>How many can you drive?</legend><input type="number" name="ride_cap" id="ride_cap" value="'+driver.cap+'" placeholder="Ride Capacity" data-theme="b" class="ui-input-text ui-body-b">';
 								input+='<legend>Notes</legend><textarea name="notes" id="notes" placeholder="Ride Notes" data-theme="b">'+driver.notes+'</textarea>';
 					            input+='<button type="submit" data-theme="b">Update</button>';
-					    input+='</div></form>---OR---<br>';
-					input+= '<form action="/driver/'+driver._id+'/delete" method="post">';
-				    input+= '<input type="submit" data-theme="e" data-role="button" data-inline="true" value="Delete RSVP"></form>';
-					input+='</div>';
+					    input+='</div></form><div class="center-this">---OR---<br>';
+
+
+       						input+='<a href="#del-conf" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-theme="e" data-transition="pop">Delete RSVP</a>';
+            					input+='<div data-role="popup" id="del-conf" data-theme="a" data-overlay-theme="a" class="ui-corner-all">';
+                				input+='<form action="/driver/'+driver._id+'/delete" method="post"><div style="padding:10px 20px;">';
+                        		input+='<h3>Are you sure you want to delete this RSVP?</h3>';
+                          	  	input+='<a href="#" data-role="button" data-inline="true" data-rel="back" data-theme="a">Cancel</a>';
+                          		input+='<input data-role="button" data-inline="true" data-theme="e" id="delete" name="delete" value="Yes, Delete" type="submit">';
+                        		input+='</div></form></div>';
+
+					input+='</div></div>';
 
 
 	            }
@@ -92,7 +101,16 @@ $.get(url_user, function(role_obj, status){
 									//add rider tiles here
 									input+='<div class="ride-tile my-breakpoint ui-block-'+String.fromCharCode(cc)+'"">';
 									input+='<p><img src="/images/rider.png" style="width:40px; height:40px;float:left;"></p>';
-	                				input+='<p class="tile_words"><a href="/user/'+rider.user_id+'">'+rider.first_name+' '+rider.last_name+'</a><br>'+rider.location;
+									var time=moment(rider.time, "HH:mm").format("h:mm A");
+					                input+='<p class="tile_words"><a href="/user/'+rider.user_id+'">'+rider.first_name+' '+rider.last_name+'</a><br>'+time+"<br>"+rider.location;
+									input+='<br>'+rider.notes;
+
+
+
+
+									// input+='<div class="ride-tile my-breakpoint ui-block-'+String.fromCharCode(cc)+'"">';
+									// input+='<p><img src="/images/rider.png" style="width:40px; height:40px;float:left;"></p>';
+	        //         				input+='<p class="tile_words"><a href="/user/'+rider.user_id+'">'+rider.first_name+' '+rider.last_name+'</a><br>'+rider.location;
 	                				
 	                				if(role_obj._id == rider._id){
 							        	input+='<br><a href="#'+rider._id+'-ride" data-rel="popup" data-position-to="window" data-mini="true" data-role="button" data-inline="true" data-icon="gear" data-theme="a" data-transition="pop">Change</a>';
@@ -100,17 +118,27 @@ $.get(url_user, function(role_obj, status){
 										    input+='<form id="rider_edit" action="/rider/'+rider._id+'/edit" method="post"><div style="padding:10px 20px;">';
 										            input+='<h3>Change RSVP</h3>';
 										            input+='<legend>Where from?</legend><input type="text" name="location" id="location" value="'+rider.location+'" placeholder="Location" data-theme="b">';
+										            
 					                                input+='<legend>What time?</legend><input type="time" name="time" id="time" value="'+rider.time+'" placeholder="Leave Time" data-theme="b">';
 													input+='<legend>Notes</legend><textarea name="notes" id="notes" placeholder="Ride Notes" data-theme="b">'+rider.notes+'</textarea>';
 										            input+='<button type="submit" data-theme="b">Update</button>';
-										    input+='</div></form>---OR---';
+										    input+='</div></form><div class="center-this">---OR---';
 										input+= '<form action="/carpool/rider/'+rider._id+'/delete" method="post">';
 									    input+= '<input type="submit" data-theme="e" data-role="button" data-inline="true" value="Leave Car"></form>';
-									    input+='---OR---';
-										input+= '<form action="/rider/'+rider._id+'/delete" method="post">';
-									    input+= '<input type="submit" data-theme="e" data-role="button" data-inline="true" value="Delete RSVP"></form>';
-										input+='</div>';
+									    input+='---OR---<br>';
+
+									    	input+='<a href="#del-conf" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-theme="e" data-transition="pop">Delete RSVP</a>';
+			            					input+='<div data-role="popup" id="del-conf" data-theme="a" data-overlay-theme="a" class="ui-corner-all">';
+			                				input+='<form action="/rider/'+rider._id+'/delete" method="post"><div style="padding:10px 20px;">';
+			                        		input+='<h3>Are you sure you want to delete this RSVP?</h3>';
+			                          	  	input+='<a href="#" data-role="button" data-inline="true" data-rel="back" data-theme="a">Cancel</a>';
+			                          		input+='<input data-role="button" data-inline="true" data-theme="e" id="delete" name="delete" value="Yes, Delete" type="submit">';
+			                        		input+='</div></form></div>';
+
+									    input+='</div></div>';
+
 						            }
+
 						            if(role_obj._id == driver._id){
 						            	input+= '<br><form action="/carpool/rider/'+rider._id+'/delete" method="post">';
 									    input+= '<input type="submit" data-theme="e" data-role="button" data-mini="true" data-inline="true" value="Remove"></form>';
@@ -186,7 +214,8 @@ $.get(url_user, function(role_obj, status){
 							if(cp_or_null){input+='ui-disabled';}
 							input+=' my-breakpoint ui-block-'+String.fromCharCode(cc)+'"">';
 							input+='<p><img src="/images/rider.png" style="width:40px; height:40px;float:left;"></p>';
-			                input+='<p class="tile_words"><a href="/user/'+rider.user_id+'">'+rider.first_name+' '+rider.last_name+'</a><br>'+rider.time+" "+rider.location;
+							var time=moment(rider.time, "HH:mm").format("h:mm A");
+			                input+='<p class="tile_words"><a href="/user/'+rider.user_id+'">'+rider.first_name+' '+rider.last_name+'</a><br>'+time+"<br>"+rider.location;
 							input+='<br>'+rider.notes;
 
 			                //drivers only
@@ -206,10 +235,20 @@ $.get(url_user, function(role_obj, status){
 			                                input+='<legend>What time?</legend><input type="time" name="time" id="time" value="'+rider.time+'" placeholder="Leave Time" data-theme="b">';
 											input+='<legend>Notes</legend><textarea name="notes" id="notes" placeholder="Ride Notes" data-theme="b">'+rider.notes+'</textarea>';
 								            input+='<button type="submit" data-theme="b">Update</button>';
-								    input+='</div></form>---OR---<br>';
-								input+= '<form action="/rider/'+rider._id+'/delete" method="post">';
-							    input+= '<input type="submit" data-theme="e" data-role="button" data-inline="true" value="Delete RSVP"></form>';
-								input+='</div>';
+								    input+='</div></form><div class="center-this">---OR---<br>';
+
+
+
+           						input+='<a href="#del-conf" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-theme="e" data-transition="pop">Delete RSVP</a>';
+            					input+='<div data-role="popup" id="del-conf" data-theme="a" data-overlay-theme="a" class="ui-corner-all">';
+                				input+='<form action="/rider/'+rider._id+'/delete" method="post"><div style="padding:10px 20px;">';
+                        		input+='<h3>Are you sure you want to delete this RSVP?</h3>';
+                          	  	input+='<a href="#" data-role="button" data-inline="true" data-rel="back" data-theme="a">Cancel</a>';
+                          		input+='<input data-role="button" data-inline="true" data-theme="e" id="delete" name="delete" value="Yes, Delete" type="submit">';
+                        		input+='</div></form></div>';
+
+
+								input+='</div></div>';
 						    }
 
 			                input+='</p></div>';
@@ -228,6 +267,8 @@ $.get(url_user, function(role_obj, status){
 
 			if(riders.length==0){
 				$("#rider-box").append("<h1>No riders have RSVPd yet</h1>").trigger("create");
+			}else{
+				$("#stranded_riders").addClass("border-block").trigger("create");
 			}
 
 	});//loads stranded riders

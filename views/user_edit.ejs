@@ -2,8 +2,8 @@
 <div class="container">
     <form action=<%="/user/"+id+"/save" %> method="post" data-mini="true">
         <div data-role="fieldcontain">
-            <label>Username:</label>
-            <input type="text" name="username"  id="username" value="<%= username%>">
+            <label>Email:</label>
+            <input type="text" name="email" id="email" value="<%= email%>">
         </div>
         <div data-role="fieldcontain">
             <label>Password:</label>
@@ -17,10 +17,7 @@
             <label>Last Name:</label>
             <input type="text" name="last_name" id="last_name" value="<%= last_name%>">
         </div>
-        <div data-role="fieldcontain">
-            <label>Email:</label>
-            <input type="text" name="email" id="email" value="<%= email%>">
-        </div>
+
         <div data-role="fieldcontain">
             <label for="textarea">Contact Info:</label>
             <textarea name="contact" id="contact"><%= contact%></textarea>

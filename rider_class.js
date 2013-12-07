@@ -192,17 +192,24 @@ RiderClass.prototype.update = function(riderId, riders, callback) {
 
 //delete rider
 RiderClass.prototype.delete = function(riderId, callback) {
-        this.getCollection(function(error, rider_collection) {
-                if(error) callback(error);
-                else {
-                        rider_collection.remove(
-                                {_id: rider_collection.db.bson_serializer.ObjectID.createFromHexString(riderId)},
-                                function(error, rider){
-                                        if(error) callback(error);
-                                        else callback(null, rider)
-                                });
-                        }
-        });
+  this.getCollection(function(error, rider_collection) {
+    if(error) callback(error);
+    else {
+      carpoolClass.findByRider(riderId, function(err, carpools){
+        for(var ii=0; ii<carpools.length;ii++){
+
+          carpoolClass.delete(carpools[ii]._id.toString(), function(err, result){});
+        }
+
+        rider_collection.remove(
+        {_id: rider_collection.db.bson_serializer.ObjectID.createFromHexString(riderId)},
+        function(error, rider){
+          if(error) callback(error);
+          else callback(null, rider)
+        });                  
+      });
+    }
+  });
 };
 
 exports.RiderClass = RiderClass;

@@ -4,19 +4,31 @@
     <script src="/javascripts/car_gmap.js"></script>
 
     <div class="container">
-        <div>
-            <p>Event Name:  <%=event.name%></p>
+        <div id="googleMap"></div>
+        <div id="event_description_block">
+        <div id="event_desc_top">
+            <div id="event_head">
+                <p><h2><a href="/event/<%=event._id%>"><%=event.name%></a></h2></p>
+            </div>
+            <div id="event_des">
+                <br>
+                <p><%=date%>
+                <br><br>
+                Start:  <%=start%>
+                <br>
+                End:  <%=end%></p>
+            </div>
+            </div>
+            <div style="clear:both;"></div>
+                <hr>
+            <div>
+                <p>Location:  <%=event.location%></p>
+            </div>
+                <hr>
+            <div>
+                <p>Description:  <%=event.description%></p>
+            </div>
         </div>
-        <div>
-            <p>Date:  <%=event.date%></p>
-        </div>
-        <div>
-            <p>Location:  <%=event.location%></p>
-        </div>
-        <div>
-            <p>Start Time:  <%=event.start_time%></p>
-        </div>
-        <div id="googleMap" style="width:500px;height:380px;"></div>
 
         <ul data-role="listview" data-inset="true">
             <%=%>
@@ -25,7 +37,7 @@
                 <a href="/user/<%=driver.user_id%>"><h2><%= driver.first_name%> <%=driver.last_name%></h2>
                 <p><strong><%=driver.location%></strong></p>
                 <p><%=driver.notes%></p>
-                <p class="ui-li-aside"><strong><%=driver.time%></strong></p>
+                <p class="ui-li-aside"><strong><%=moment(driver.time,"HH:mm").format("h:mm A")%></strong></p>
                 </a>
             </li>
             <li data-role="list-divider">Riders<span class="ui-li-count"><%=riders.length%>/<%=driver.cap%></span></li>
@@ -34,7 +46,7 @@
                 <a href="/user/<%=rider.user_id%>"><h2><%= rider.first_name%> <%=rider.last_name%></h2>
                 <p><strong><%=rider.location%></strong></p>
                 <p><%=rider.notes%></p>
-                <p class="ui-li-aside"><strong><%=rider.time%></strong></p>
+                <p class="ui-li-aside"><strong><%=moment(rider.time,"HH:mm").format("h:mm A")%></strong></p>
                 </a>
             </li>
             <% } %>

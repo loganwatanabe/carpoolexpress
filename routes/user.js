@@ -19,17 +19,26 @@ exports.new = function(req, res){
 
 
 exports.create = function(req, res){
-  userClass.save({
-      username: req.param('username'),
-      password: req.param('password'),
-      first_name: req.param('first_name'),
-      last_name: req.param('last_name'),
-      email: req.param('email'),
-      contact: req.param('contact')
-    }, function(err, docs){
-      res.redirect('/');
-      //effed up
-    });
+  var email = req.param('email');
+  userClass.findByEmail(email, function(error, prof){
+    if(prof){   //there already exists a user with that email
+      //flash message
+      console.log("email alredy being used");
+      res.redirect('/register');
+    }else{
+      userClass.save({
+        // username: req.param('username'),
+        password: req.param('password'),
+        first_name: req.param('first_name'),
+        last_name: req.param('last_name'),
+        email: req.param('email'),
+        contact: req.param('contact')
+      }, function(err, docs){
+        res.redirect('/');
+      });
+    }
+
+  });
 };
 
 exports.get = function(req, res){
@@ -42,7 +51,7 @@ exports.get = function(req, res){
       }
         res.render('user_show',
         { locals: {
-          username: user.username,
+          // username: user.username,
           password: user.password,
           first_name: user.first_name,
           last_name: user.last_name,
@@ -53,12 +62,20 @@ exports.get = function(req, res){
           id:user._id,
           user:req.user,
           authorized: authorized,
-          title:user.username
+          title:user.first_name
         }
         });
     }
     });
 };
+
+exports.info = function(req, res){
+  userClass.findById(req.params.id, function(error, user) {
+      res.send(user);
+    });
+};
+
+
 
 exports.edit = function(req, res){
   userClass.findById(req.params.id, function(error, user) {
@@ -68,19 +85,18 @@ exports.edit = function(req, res){
         res.render('user_edit',
         { locals: {
           id: user._id,
-          username: user.username,
+          // username: user.username,
           password: user.password,
           first_name: user.first_name,
           last_name: user.last_name,
           email: user.email,
           contact: user.contact,
           user:req.user,
-          title:user.username,
+          title:user.first_name,
         }
         });
       }
       else{
-        //probably messed up too
         res.redirect('/');
       }
     }
@@ -90,7 +106,7 @@ exports.edit = function(req, res){
 exports.update = function(req, res){
   if(req.user._id == req.params.id){//user edits themselves
     userClass.update(req.params.id,{$set:{
-      username: req.param('username'),
+      // username: req.param('username'),
       password: req.param('password'),
       first_name: req.param('first_name'),
       last_name: req.param('last_name'),
@@ -98,7 +114,7 @@ exports.update = function(req, res){
       contact: req.param('contact')
     }}, function(error, docs) {
       res.redirect('/user/'+req.params.id);
-      //effed up
+      
     });
   }else{
     console.log('not authorized');
@@ -109,8 +125,8 @@ exports.update = function(req, res){
 exports.delete = function(req, res){
   if(req.user._id == req.params.id){
     userClass.delete(req.params.id, function(error, docs) {
-      res.redirect('/users');
-      //effed up
+      res.redirect('/');
+      
     });
   }else{
     console.log('not authorized');

@@ -7,6 +7,9 @@ var Connection = require('mongodb').Connection;
 var BSON = require('mongodb').BSON;
 var ObjectID = require('mongodb').ObjectID;
 
+var CarpoolClass = require('./carpool_class').CarpoolClass;
+var carpoolClass = new CarpoolClass('localhost', 27017);
+
 DriverClass = function(host, port){
   var db = new mongodb.Db('nodejitsu_loganwatanabe_nodejitsudb9965101284',
             new mongodb.Server('ds045978.mongolab.com', 45978, {}), {safe:true});
@@ -143,17 +146,27 @@ DriverClass.prototype.update = function(driverId, drivers, callback) {
 
 //delete driver
 DriverClass.prototype.delete = function(driverId, callback) {
-        this.getCollection(function(error, driver_collection) {
-                if(error) callback(error);
-                else {
-                        driver_collection.remove(
-                                {_id: driver_collection.db.bson_serializer.ObjectID.createFromHexString(driverId)},
-                                function(error, driver){
-                                        if(error) callback(error);
-                                        else callback(null, driver)
-                                });
-                        }
-        });
+  this.getCollection(function(error, driver_collection) {
+    if(error) callback(error);
+    else {
+      carpoolClass.findByDriver(driverId, function(err, carpools){
+
+        for(var ii=0; ii<carpools.length;ii++){
+          carpoolClass.delete(carpools[ii]._id.toString(), function(err, result){});
+        }
+
+        driver_collection.remove(
+          {_id: driver_collection.db.bson_serializer.ObjectID.createFromHexString(driverId)},
+          function(error, driver){
+            if(error) callback(error);
+            else callback(null, driver)
+          });
+      });
+    }
+  });
 };
+
+
+
 
 exports.DriverClass = DriverClass;

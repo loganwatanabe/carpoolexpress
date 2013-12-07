@@ -11,10 +11,11 @@ var sessionStore = new RedisStore ();
 var passport = require("passport");
 var LocalStrategy = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
-var forEach = require('async-foreach');
+// var forEach = require('async-foreach');
 var googlemaps = require('googlemaps');
 googlemaps.config('key', 'AIzaSyAnhJ9slS6FaJpwogrvb5SJtEGohVY7cns');
 var util = require('util');
+var moment = require('moment');
 
 //routes
 var routes = require('./routes');
@@ -111,7 +112,7 @@ passport.deserializeUser(function(id, done) {
 
 
 passport.use(new LocalStrategy(
-  function(usernameORemail, password, done) {
+  function(email, password, done) {
     // asynchronous verification, for effect...
     process.nextTick(function () {
       
@@ -119,9 +120,9 @@ passport.use(new LocalStrategy(
       // username, or the password is not correct, set the user to `false` to
       // indicate failure and set a flash message.  Otherwise, return the
       // authenticated `user`.
-      userClass.findByUsernameOrEmail(usernameORemail, function(err, user) {
+      userClass.findByEmail(email, function(err, user) {
         if (err) { return done(err); }
-        if (!user) { return done(null, false, { message: 'Unknown username or email: ' + usernameORemail }); }
+        if (!user) { return done(null, false, { message: 'Unknown email: ' + email }); }
         if (user.password != password) { return done(null, false, { message: 'Invalid password' }); }
         return done(null, user);
       })
@@ -142,7 +143,7 @@ passport.use(new FacebookStrategy({
 	            done(null,oldUser);
 	        }else{
 	            userClass.save({
-	                username: profile.displayName,
+	                // username: profile.displayName,
 	                email : profile.emails[0].value,
 	                first_name : profile["name"].givenName,
 	                last_name : profile["name"].familyName,
@@ -172,10 +173,10 @@ app.get('/login', ensureNotAuthenticated, function(req, res){
   res.render('login.ejs', { user: req.user, message: req.flash('error') });
 });
 
-app.post('/login', ensureNotAuthenticated,
+app.post('/login',
   passport.authenticate('local', { failureRedirect: '/login', failureFlash: true }),
   function(req, res) {
-    res.redirect('/');
+    res.redirect('back');
     //effed up
   });
 
@@ -207,6 +208,8 @@ app.post('/register', ensureNotAuthenticated, user.create);
 
 app.get('/user/:id', user.get);//include variable to tell if user is the one logged in
 
+app.get('/user/:id/info', user.info);
+
 //update a user
 app.get('/user/:id/edit', ensureAuthenticated, user.edit);//further authorize in route
 
@@ -234,7 +237,7 @@ app.get('/user/:id/events', ensureAuthenticated, function(req,res){
 	  		});
 	    });
 	}else{
-		res.redirect('/');
+		res.redirect('/events');
 	}
 
 });
@@ -259,6 +262,8 @@ app.get('/user/:id/riders', ensureAuthenticated, function(req,res){
 //CRUD for events
 
 app.get('/events', event.list);
+
+app.get('/events/all', event.all);
 //google maps request, pass in location  of all events
 
 //new event
@@ -284,13 +289,18 @@ app.get('/event/:id', function(req,res){
     	 		authorized=true;
     	 	}
 
+    	 	var date=moment(event_obj.date).format("MMMM Do, YYYY");
+    	 	var start=moment(event_obj.start_time, "HH:mm").format("h:mm A");
+    	 	var end=moment(event_obj.end_time, "HH:mm").format("h:mm A");
+
+
 			res.render('event_show',
 	        { locals: {
 				name: event_obj.name,
-				date: event_obj.date,
+				date: date,
 				location: event_obj.location,
-				start_time: event_obj.start_time,
-				end_time: event_obj.end_time,
+				start_time: start,
+				end_time: end,
 				description: event_obj.description,
 				id:event_obj._id,
 				created_by: creator,
@@ -393,15 +403,14 @@ app.post('/event/:id/driver/new', ensureAuthenticated, function(req,res){
 			notes: req.param('notes')
 		}, function(err, docs){
 			res.redirect('/event/'+req.params.id);
-			//effed up
+			
 		});
-		//});
+
 	});
 
-// app.post('/event/:id/rider/new', ensureAuthenticated, function(req,res){
+
 app.post('/event/:id/rider/new', ensureAuthenticated, function(req,res){
-			//var ev;
-			//eventClass.findById(req.params.id, function(err,result){ev=result;});
+
 		riderClass.save({
 			user_id: req.user._id.toString(),
 			first_name: req.user.first_name,
@@ -414,7 +423,6 @@ app.post('/event/:id/rider/new', ensureAuthenticated, function(req,res){
 			ride: false
 		}, function(err, docs){
 			res.redirect('/event/'+req.params.id);
-			//effed up
 		});
 });
 
@@ -438,9 +446,17 @@ app.get('/driver/:driver_id/car', function(req, res) {
     driverClass.findById(req.params.driver_id, function(error, driver) {
     	eventClass.findById(driver.event_id, function(error, event_obj) {
 	        riderClass.findByCarpoolDriver(req.params.driver_id, function(error, riders) {
+
+	    	 	var date=moment(event_obj.date).format("MMMM Do, YYYY");
+	    	 	var start=moment(event_obj.start_time, "HH:mm").format("h:mm A");
+	    	 	var end=moment(event_obj.end_time, "HH:mm").format("h:mm A");
+
 	        	res.render('event_ride.ejs', {locals:{
-					title: 'Ride for '+event_obj.name,
+					title: driver.first_name+"'s car for "+event_obj.name,
 					event: event_obj,
+					date: date,
+					start: start,
+					end: end,
 					driver: driver,
 					riders: riders,
 					user:req.user
@@ -589,14 +605,13 @@ app.post('/driver/:id/edit', function(req, res) {
 			      notes: req.param('notes')
 			    }},
 				function(error, docs) {
-					res.redirect('/drivers');
-				//effed up
+					res.redirect('/event/'+driver.event_id);
 			});
 		}
 		else
 		{
 			console.log("Not Authorized to edit");
-			res.redirect('/');
+			res.redirect('/event/'+driver.event_id);
 		}
 	});
 });
@@ -613,14 +628,13 @@ app.post('/rider/:id/edit', function(req, res) {
 			      notes: req.param('notes')
 			    }},
 				function(error, docs) {
-					res.redirect('/riders');
-				//effed up
+					res.redirect('/event/'+rider.event_id);
 			});
 		}
 		else
 		{
 			console.log("Not Authorized to edit");
-			res.redirect('/');
+			res.redirect('/event/'+rider.event_id);
 		}
 	});
 });
@@ -632,14 +646,21 @@ app.post('/driver/:id/delete', ensureAuthenticated, function(req, res) {
 		if(req.user._id.toString()==driver.user_id){
 
 			driverClass.delete(req.params.id, function(error, docs) {
-				res.redirect('/drivers');
-				//effed up
+				// carpoolClass.findByDriver(req.params.id, function(error, carpools){
+
+				// 	for(var ii=0; ii<carpools.length;ii++){
+			 //          carpoolClass.delete(carpools[ii]._id.toString(), function(){});
+				//     }
+
+				// });
+				
+				res.redirect('/event/'+driver.event_id);
 			});
 		}
 		else
 		{
 			console.log("Not Authorized to delete");
-			res.redirect('/');
+			res.redirect('/event/'+driver.event_id);
 		}
 	});
 });
@@ -649,14 +670,20 @@ app.post('/rider/:id/delete', ensureAuthenticated, function(req, res) {
 		if(req.user._id.toString()==rider.user_id){
 
 			riderClass.delete(req.params.id, function(error, docs) {
-				res.redirect('/riders');
-				//effed up
+				// carpoolClass.findByRider(req.params.id, function(error, carpools){
+
+				// 	for(var ii=0; ii<carpools.length;ii++){
+			 //          carpoolClass.delete(carpools[ii]._id.toString(), function(){});
+				//     }
+
+				// });
+				res.redirect('/event/'+rider.event_id);
 			});
 		}
 		else
 		{
 			console.log("Not Authorized to delete");
-			res.redirect('/');
+			res.redirect('/event/'+rider.event_id);
 		}
 	});
 });
@@ -671,22 +698,18 @@ app.post('/driver/:driver_id/rider/:rider_id/new', ensureAuthenticated, function
 			rider_accept: true,//req.param('rider_accept'),
 			status: "accepted"
 		}, function(err, docs){
-			res.redirect('back');
-			//effed up
+
+			//update rider status
+			riderClass.update(req.params.rider_id, 
+				{$set:{
+			      ride: true
+			    }},
+				function(error, docs) {
+					res.redirect('back');//test
+			});
+			
 		});
-		//});
 	});
-
-// app.post('/carpool/:id/delete', ensureAuthenticated, function(req, res) {
-
-// 	//authorization?
-// 		carpoolClass.delete(req.params.id, function(error, docs) {
-// 			res.redirect('/events');
-// 			//effed up
-// 		});
-
-// });
-
 
 app.post('/carpool/rider/:rider_id/delete', ensureAuthenticated, function(req, res) {
 
@@ -694,8 +717,13 @@ app.post('/carpool/rider/:rider_id/delete', ensureAuthenticated, function(req, r
 	carpoolClass.findRideForRider(req.params.rider_id, function(err, carpool){
 
 		carpoolClass.delete(carpool._id.toString(), function(error, docs) {
-			res.redirect('/');
-			//effed up
+			riderClass.update(req.params.rider_id, 
+				{$set:{
+			      ride: false
+			    }},
+				function(error, docs) {
+					res.redirect('back');//test
+			});
 		});
 
 	});
@@ -720,12 +748,4 @@ function ensureAuthenticated(req, res, next) {
 function ensureNotAuthenticated(req, res, next) {
   if (!req.isAuthenticated()) { return next(); }
   res.redirect('/')
-}
-
-function format_date(date){
-
-}
-
-function format_time(time){
-	
 }

@@ -7,6 +7,14 @@ var Connection = require('mongodb').Connection;
 var BSON = require('mongodb').BSON;
 var ObjectID = require('mongodb').ObjectID;
 
+var DriverClass = require('./driver_class').DriverClass;
+var driverClass = new DriverClass('localhost', 27017);
+
+var RiderClass = require('./rider_class').RiderClass;
+var riderClass = new RiderClass('localhost', 27017);
+
+
+
 EventClass = function(host, port){
   var db = new mongodb.Db('nodejitsu_loganwatanabe_nodejitsudb9965101284',
             new mongodb.Server('ds045978.mongolab.com', 45978, {}), {safe:true});
@@ -54,6 +62,18 @@ EventClass.prototype.findById = function(id, callback) {
     });
 };
 
+EventClass.prototype.findByUser = function(userID, callback) {
+    this.getCollection(function(error, event_collection) {
+      if( error ) callback(error)
+      else {
+        event_collection.find({created_by_id: userID}).toArray(function(error, results) {
+          if( error ) callback(error)
+          else callback(null, results)
+        });
+      }
+    });
+};
+
 //save new event
 EventClass.prototype.save = function(events, callback) {
     this.getCollection(function(error, event_collection) {
@@ -93,17 +113,30 @@ EventClass.prototype.update = function(eventId, events, callback) {
 
 //delete event
 EventClass.prototype.delete = function(eventId, callback) {
-        this.getCollection(function(error, event_collection) {
-                if(error) callback(error);
-                else {
-                        event_collection.remove(
-                                {_id: event_collection.db.bson_serializer.ObjectID.createFromHexString(eventId)},
-                                function(error, event){
-                                        if(error) callback(error);
-                                        else callback(null, event)
-                                });
-                        }
-        });
+  this.getCollection(function(error, event_collection) {
+    if(error) callback(error);
+    else {
+      driverClass.findByEvent(eventId, function(erro, drivers){
+        for(var ii=0; ii<drivers.length;ii++){
+          driverClass.delete(drivers[ii]._id.toString(), function(er, result){});
+        }
+
+        riderClass.findByEvent(eventId, function(err, riders){
+
+          for(var ii=0; ii<riders.length;ii++){
+            riderClass.delete(riders[ii]._id.toString(), function(e, result){});
+          }
+
+          event_collection.remove(
+                  {_id: event_collection.db.bson_serializer.ObjectID.createFromHexString(eventId)},
+                  function(error1, event_obj){
+                          if(error1) callback(error1);
+                          else callback(null, event_obj)
+                  });
+          });
+      });
+    }
+  });
 };
 
 exports.EventClass = EventClass;

@@ -23,7 +23,7 @@ $(function() { //document is loaded and ready
 				$.get('/driver/'+driver._id+'/rides', function(rides){
 					if(rides.length==0){	input+='no people.';}
 					else if(rides.length==1){ input+='1 person.';}
-					else{ rides.length+' people.';}
+					else{ input+=rides.length+' people.';}
 
 					input+='</p></a></li>';
 

@@ -33,11 +33,11 @@ a {
 
 /**For the event show page**/
 .row-odd{
-	background-color: #888888;
+	background-color: #E6E6E6;
 }
 
 .row-even{
-	background-color: #E8E8E8;
+	background-color: #E6E6E6;
 }
 
 .border-block{
@@ -126,31 +126,8 @@ a {
 
 
 
-/**@media (min-width:60em) {
-	/
-	.jqm-header h1.jqm-logo {
-		margin-left: 15%;
-	}
-	.jqm-header .jqm-navmenu-link {
-		left: 15%;
-	}
-	.jqm-search,
-	.jqm-search-toggle .jqm-search {
-		right: 15%;
-	}
-	
-	.jqm-footer .jqm-version {
-		margin-right: 15%;
-		margin-left: 15%;
-	}
-	
-	.jqm-demos .jqm-content {
-		padding-right: 15%;
-		padding-left: 15%;
-	}
-}**/
 
-/* stack all grids below 40em (640px) */
+/* stack all grids below 800px) */
 @media all and (max-width: 800px) {
 	body{
 		width: 100%;

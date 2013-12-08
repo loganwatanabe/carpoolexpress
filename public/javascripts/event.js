@@ -107,12 +107,7 @@ $.get(url_user, function(role_obj, status){
 
 
 
-
-									// input+='<div class="ride-tile my-breakpoint ui-block-'+String.fromCharCode(cc)+'"">';
-									// input+='<p><img src="/images/rider.png" style="width:40px; height:40px;float:left;"></p>';
-	        //         				input+='<p class="tile_words"><a href="/user/'+rider.user_id+'">'+rider.first_name+' '+rider.last_name+'</a><br>'+rider.location;
-	                				
-	                				if(role_obj._id == rider._id){
+								if(role_obj._id == rider._id){
 							        	input+='<br><a href="#'+rider._id+'-ride" data-rel="popup" data-position-to="window" data-mini="true" data-role="button" data-inline="true" data-icon="gear" data-theme="a" data-transition="pop">Change</a>';
 										input+='<div data-role="popup" id="'+rider._id+'-ride" data-theme="a" class="ui-corner-all">';
 										    input+='<form id="rider_edit" action="/rider/'+rider._id+'/edit" method="post"><div style="padding:10px 20px;">';

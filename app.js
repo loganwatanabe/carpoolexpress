@@ -53,7 +53,7 @@ app.configure(function(){
 	app.use(express.cookieParser('your secret here'));
 
 
-	app.use(express.session({ secret: 'secret'}));
+	app.use(express.cookieSession({ secret: 'secret'}));
 	app.use(passport.initialize());
 	app.use(passport.session());
 
@@ -84,9 +84,9 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(id, done) {
-		userClass.findById(id, function (err, user) {
-	done(err, user);
-		});
+	userClass.findById(id, function (err, user) {
+		done(err, user);
+	});
 });
 
 
@@ -113,7 +113,8 @@ passport.use(new FacebookStrategy({
   },
   function(accessToken, refreshToken, profile, done) {
     process.nextTick(function () {
-	    userClass.findByUsernameOrEmail(profile.emails[0].value, function(err, oldUser){
+	    userClass.findByEmail(profile.emails[0].value, function(err, oldUser){
+	    	console.log("oldUser:  "+oldUser);
 	        if(oldUser){
 	            done(null,oldUser);
 	        }else{
@@ -124,8 +125,9 @@ passport.use(new FacebookStrategy({
 	                access : accessToken,
 	                fb_id : profile.id
 	            }, function(err,newUser){
+	            	var user = newUser[0];
 	                if(err) throw err;
-	                done(null, newUser);
+	                done(null, user);
 	            });
 	        }
 	    })
@@ -154,8 +156,13 @@ app.post('/login',
   });
 
 //for passport-facebook
-app.get('/auth/facebook', ensureNotAuthenticated, passport.authenticate('facebook', { scope: ['email'] }), function(req,res){});
-app.get('/auth/facebook/callback', passport.authenticate('facebook', { successRedirect: '/', failureRedirect: '/login' }), function(req,res){});
+app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }), function(req,res){});
+app.get('/auth/facebook/callback', passport.authenticate('facebook', 
+	{ failureRedirect: '/login' }),
+	function(req,res){
+		req.flash('info', 'Successfully connected with Facebook')
+		res.redirect('/');
+	});
 
 app.get('/logout', ensureAuthenticated, function(req, res){
   req.logout();

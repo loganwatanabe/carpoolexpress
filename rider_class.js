@@ -20,7 +20,7 @@ RiderClass = function(host, port){
         // You are now connected and authenticated.
       });
   });
-  this.db=db;  
+  this.db=db;
   // this.db.open(function(){});
 };
 

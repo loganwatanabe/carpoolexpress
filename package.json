@@ -1,7 +1,7 @@
 {
   "name": "lwatanab-demo",
   "subdomain": "lwatanab",
-  "version": "0.1.0-1",
+  "version": "1.0.0",
   "engines": {
     "node": "v0.8.x"
   },
@@ -16,13 +16,11 @@
     "passport": "*",
     "passport-local": "*",
     "passport-facebook": "*",
-    "connect-roles": "*",
     "connect-flash": "*",
     "connect-redis": "*",
-    "express-helpers": "1.3.1",
-    "async-foreach": "*",
     "googlemaps": "*",
     "util": "*",
+    "express-helpers": "*",
     "moment": "*"
   }
 }

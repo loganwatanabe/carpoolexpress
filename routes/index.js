@@ -4,5 +4,5 @@
  */
 
 exports.index = function(req, res){
-  res.render('index', { title: 'Express', user:req.user });
+  res.render('index', { title: 'Carpool Express', user:req.user, message: req.flash('info') });
 };

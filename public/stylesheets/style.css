@@ -16,6 +16,16 @@ a {
 	text-align: center;
 }
 
+#flash-message{
+	text-align: center;
+	padding-top: 5px;
+}
+
+#flash-container{
+	text-align: center;
+	padding-left: 10%;
+	padding-right: 10%;
+}
 
 .center-this{
 	text-align: center;

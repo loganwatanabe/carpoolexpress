@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
     <script src="/javascripts/moment.js"></script>
     <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-
+    <script src="/javascripts/general.js"></script>
     <script type="text/javascript">
     $(document).bind("mobileinit", function () {
         $.mobile.ajaxEnabled = false;
@@ -59,9 +59,11 @@
       <%}%>
     </div>
 
-    <!-- if (message) { -->
-    <p><!-- message --></p>
-    <!-- } -->
+    <% if (message!="") { %>
+    <div id="flash-container" class="container">
+    <div id="flash-message" class="ui-body ui-body-e"><%=message%> <a data-mini="true" id="flash-close"href="#" style="float:right;" data-inline="true" data-role="button" data-icon="delete">close</a></div>
+    </div>
+    <% } %>
 
     <%- body%>
 

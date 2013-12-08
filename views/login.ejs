@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width">
         <link rel="stylesheet" href="/jquery.mobile-1.3.2/jquery.mobile-1.3.2.css" />
         <script src="/javascripts/jquery-1.10.2.min.js"></script>
+        <script src="/javascripts/general.js"></script>
+
 
     <script type="text/javascript">
     $(document).bind("mobileinit", function () {
@@ -23,9 +25,17 @@
     </div>
 
     <div id="container" style="padding-left:5%;padding-right:5%;">
-    <% if (message) { %>
-    <p><%= message %></p>
+
+
+    <% if (message!="") { %>
+    <div id="flash-container">
+    <br><br>
+    <div id="flash-message" class="ui-body ui-body-e"><%=message%> <a data-mini="true" id="flash-close"href="#" style="float:right;" data-inline="true" data-role="button" data-icon="delete">close</a></div>
+    <br><br>
+    </div>
     <% } %>
+
+
     <form action="/login" method="post" data-mini="true">
         <div>
             <label>Email:</label>
